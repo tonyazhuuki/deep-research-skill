@@ -154,12 +154,37 @@ Read the user's profile and assess what data is available. This determines how s
 | MINIMAL | "Practical implementation: adherence strategies, cost-effectiveness, barriers, realistic protocols" |
 | NONE | "Applications: real-world use cases, common mistakes, implementation frameworks" |
 
+**Data discovery — ASK the user if data is missing (MANDATORY for health/nutrition):**
+
+If USER_CONTEXT is set but the profile depth is MINIMAL or BASIC, and the research domain is health or nutrition — **do NOT silently proceed**. Ask the user:
+
+```
+I found your profile but some data that would significantly improve this research is missing:
+
+Missing:
+- [ ] Lab results (blood work, metabolic panel)
+- [ ] Genetics (SNPs, 23andMe, etc.)
+- [ ] Current supplements/medications
+
+You can:
+1. Give me a file path (e.g., "./labs/results.pdf" or "./health/my_labs.md")
+2. Paste the data directly in chat
+3. Skip — I'll do universal research without personalization
+
+Which would you prefer?
+```
+
+Only show the missing items that are actually missing. If user provides a path — read it and re-assess depth. If user pastes data — incorporate it. If user skips — proceed with current depth.
+
+For non-health domains (ai, finance, business): do NOT ask. Silently adapt streams and proceed — personalization is less critical.
+
 **Record in `_PROGRESS_LOG.md`:**
 ```
 ## Profile Assessment
 - Depth: [RICH / BASIC / MINIMAL / NONE]
 - Available: [list what's filled]
 - Missing: [list what's empty]
+- User prompted for missing data: [yes/no, what they provided]
 - Stream C adapted to: [description]
 - Personalization strategy: [what will be personalized, what will be generic]
 ```
