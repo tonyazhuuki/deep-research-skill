@@ -152,22 +152,36 @@ The pipeline works because of well-established principles from ensemble ML and t
 
 Costs depend on topic complexity and Claude model used. These estimates assume Claude Sonnet for subagents.
 
-## Customization
+## Personalization
 
-### Adding user context for personalization
+The skill works at three levels depending on how much context you provide:
 
-Create a profile file and set `USER_CONTEXT` in your `CLAUDE.md`:
+| Level | What you provide | What you get |
+|-------|-----------------|-------------|
+| **No context** | Nothing — just run `/research` | Universal evidence (consensus mode). Still valuable. |
+| **Basic profile** | Demographics, goals, raw lab numbers | Personalized synthesis with your data factored in |
+| **Full context** | Labs + interpreted profiles + genetics + protocols | Maximum personalization: dosing, genetic modifiers, interaction checks |
+
+### Setting up your profile
+
+1. Copy the template: `cp profile_template.md my_profile.md`
+2. Fill in what you have — leave empty fields as-is (the skill ignores them)
+3. Set `USER_CONTEXT` in your `CLAUDE.md`:
 
 ```markdown
-# My Profile
-- Age: 35, Female
-- Health conditions: [list]
-- Current supplements: [list]
-- Goals: [list]
-- Lab results: [summary]
+## Research Configuration
+- USER_CONTEXT: ./my_profile.md
 ```
 
-The skill will automatically load this context when running in `personalized` or `full` mode.
+See [`profile_template.md`](profile_template.md) for the full template.
+
+### Raw data vs. interpreted profiles
+
+**Raw lab numbers** (e.g., "Ferritin: 6.19 ng/mL") are useful, but **interpreted profiles** are far more valuable. An interpreted profile contains context, targets, trends, and genetic modifiers — not just a number.
+
+If you already have health analysis documents (cardiovascular risk assessment, lipid panel interpretation, biomarker tracking sheets), add their paths in the "Interpreted Profiles" section of your profile. The skill will read them and use the richer context for personalization.
+
+Don't have interpreted profiles? No problem — raw numbers work fine. The skill will interpret them based on population references.
 
 ### Adjusting for your domain
 
