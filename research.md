@@ -116,15 +116,62 @@ ORCHESTRATOR (you) — coordination, reflections, final decisions
 
 ### 0b. Standard Preparation
 
-1. If USER_CONTEXT is set, read the user profile files for personalization context
-2. For health/nutrition domains with user context, load: lab results, genetics, fitness profile, supplement stack, active protocols
+1. If USER_CONTEXT is set, read the user profile file(s)
+2. For health/nutrition domains with user context, also load any files referenced in the "Interpreted Profiles" section of the profile
+
+### 0c. Profile Assessment (MANDATORY if USER_CONTEXT is set)
+
+Read the user's profile and assess what data is available. This determines how streams are adapted.
+
+**Assessment checklist:**
+
+| Data type | Check for | Status |
+|-----------|----------|--------|
+| **Demographics** | Age, sex, conditions, medications | ✅ / ❌ |
+| **Raw labs** | Any filled rows in Lab Results table | ✅ partial / ✅ full / ❌ |
+| **Interpreted profiles** | Paths to analysis docs (cardio risk, lipid panel, etc.) | ✅ / ❌ |
+| **Genetics** | Any SNPs or genetic test results | ✅ / ❌ |
+| **Supplements** | Current stack with doses | ✅ / ❌ |
+| **Training/wearable** | Activity data, wearable metrics | ✅ / ❌ |
+| **Diet** | Pattern, restrictions, intolerances | ✅ / ❌ |
+| **Goals** | Explicit optimization targets | ✅ / ❌ |
+
+**Profile depth classification:**
+
+| Depth | Criteria | Impact on research |
+|-------|---------|-------------------|
+| **RICH** | Demographics + labs + ≥2 of (genetics, profiles, supplements, training) | Full personalization. Stream C = deep personalization with genetic modifiers. DOMAIN_REVIEWER checks against full profile. |
+| **BASIC** | Demographics + goals + some labs OR supplements | Moderate personalization. Stream C = population subgroup matching (age/sex/conditions). DOMAIN_REVIEWER checks generic safety. |
+| **MINIMAL** | Only demographics or goals, no labs/genetics | Light personalization. Stream C is REPLACED: instead of personalization, use "practical implementation" (barriers, adherence, cost-effectiveness). Synthesis includes generic population recommendations, not personalized dosing. |
+| **NONE** | USER_CONTEXT not set or empty | No personalization. All streams are universal. Mode auto-downgrades: `personalized` → behaves like `consensus` with practical focus. `full` → behaves like `consensus+interactions`. |
+
+**Stream C adaptation by depth:**
+
+| Depth | Stream C becomes |
+|-------|-----------------|
+| RICH | "Personalization: genetic modifiers, lab-based dosing, interaction with current stack, protocol gaps" |
+| BASIC | "Subgroup analysis: what changes for [age/sex/conditions]? Population-specific dose-response, risk factors" |
+| MINIMAL | "Practical implementation: adherence strategies, cost-effectiveness, barriers, realistic protocols" |
+| NONE | "Applications: real-world use cases, common mistakes, implementation frameworks" |
+
+**Record in `_PROGRESS_LOG.md`:**
+```
+## Profile Assessment
+- Depth: [RICH / BASIC / MINIMAL / NONE]
+- Available: [list what's filled]
+- Missing: [list what's empty]
+- Stream C adapted to: [description]
+- Personalization strategy: [what will be personalized, what will be generic]
+```
+
+**If interpreted profiles are available** — they take priority over raw numbers. Read the full analysis documents, not just the profile summary. These contain targets, trends, history, and genetic context that raw numbers don't.
 
 ### Determine domain and load context:
 
 | Domain | Additional context | Default streams |
 |--------|-------------------|-----------------|
-| **health** | User labs + fitness profile + genetics + protocols (if available) | A: RCTs/meta-analyses, B: mechanisms, C: personalization, D: interactions, E: practical protocol |
-| **nutrition** | User labs + supplements + diet protocols (if available) | A: dose-response, B: absorption/metabolism, C: interactions, D: safety, E: personalized protocol |
+| **health** | User profile (depth-dependent) | A: RCTs/meta-analyses, B: mechanisms, C: *adapted by depth*, D: interactions, E: practical protocol |
+| **nutrition** | User profile (depth-dependent) | A: dose-response, B: absorption/metabolism, C: *adapted by depth*, D: safety, E: personalized protocol |
 | **ai** | Tech projects, industry context | A: landscape/state-of-art, B: benchmarks/data, C: economics, D: risks/limitations, E: investment thesis |
 | **finance** | Portfolio, risk tolerance | A: fundamentals, B: technicals/data, C: macro, D: risks, E: actionable strategy |
 | **psychology** | Personal context (if available) | A: evidence base, B: mechanisms, C: modalities, D: personal application, E: integration plan |
