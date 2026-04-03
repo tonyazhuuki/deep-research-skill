@@ -1,208 +1,197 @@
 # Deep Research Skill for Claude Code
 
-A drop-in [Claude Code](https://docs.anthropic.com/en/docs/claude-code) skill that turns Claude into a 10-15 agent research team. Three cycles, adversarial review, quality gates — all automated.
+A drop-in [Claude Code](https://docs.anthropic.com/en/docs/claude-code) skill that turns Claude into a 10-18 agent research team. Three cycles, hypothesis-driven, adversarial review, domain-specific quality gates — all automated.
 
-One command. ~$3-12 per session. 300-800 line synthesis with evidence grades.
+One command. ~$3-15 per session. 300-800 line synthesis with evidence grades.
 
 ## What It Does
 
-```
-/research "creatine safety and efficacy" high 6 consensus
+```bash
+/research creatine safety high 4h consensus
+/research AI agents in financial services consensus high 4h
+/research transformer architectures consensus high 4h
+/research global electricity demand consensus high 6h
 ```
 
 This launches a 3-cycle research pipeline:
 
-**Cycle 1 — Broad Search:** 4-5 SCOUT agents explore the topic in parallel, each with a different reasoning style (analytical, contrarian, mechanistic, systems-thinking, pragmatic). A CRITIC tears apart their findings. A STATISTICIAN grades the cited studies.
+**Cycle 1 — Broad Search:** 4-5 SCOUT agents explore the topic in parallel, each with a different reasoning style (analytical, contrarian, mechanistic, systems-thinking, pragmatic). A CRITIC tears apart their findings. A domain-specific METHODOLOGIST grades evidence quality.
 
-**Cycle 2 — Deep Dives:** 2-3 agents investigate the most important gaps identified by the CRITIC. A convergence check determines if findings agree enough for synthesis.
+**Cycle 2 — Deep Dives:** 2-3 agents test hypotheses and answer mandatory stress-test questions. If claims remain CONTESTED (confidence <0.5), iterative deepening auto-spawns additional agents to find tiebreaker evidence (max 2 rounds).
 
-**Cycle 3 — Synthesis:** A SYNTHESIZER integrates everything into a coherent document. A FACT-CHECKER verifies the top 15 numerical claims. A domain-specific reviewer (e.g., medical for health topics) checks safety.
+**Cycle 3 — Synthesis:** A SYNTHESIZER integrates everything. A FACT-CHECKER verifies top 15 numerical claims. A DOMAIN REVIEWER (medical, macro, market, or methodology) stress-tests conclusions. An ACTION MAPPER converts findings into actionable updates.
 
-**Output:** 15-25 files including synthesis, data CSVs, Python visualizations, quality gate reports, and an unknowns tracker.
+**Output:** 15-25 files including synthesis, consensus reference, interaction maps, data CSVs, quality gate reports, and an unknowns tracker.
 
-## Features
+## v4.2 Features
 
-- **4 research modes:** personalized, consensus, consensus+interactions, full
-- **10 specialized agent roles** with distinct prompts and outputs
-- **5 diverse reasoning styles** to reduce correlated errors between agents (Hong & Page 2004)
-- **Convergence checking** at Reflection 2 — quantified agreement rate with decision thresholds
-- **Two-tier evidence grading** (A-D for both RCT and observational evidence)
-- **Quality gates:** CRITIC (mandatory), STATISTICIAN (auto for health), DOMAIN_REVIEWER (auto for health), FACT-CHECKER (always mandatory)
-- **Domain-aware:** auto-loads relevant context and adjusts streams for health, nutrition, AI, finance, psychology, business
-- **Bilingual support:** optional translation to any language
+- **4 domain adapters** with specialized evidence hierarchies, reviewers, and anti-pattern guards
+- **Hypothesis-driven** cycles — not just search, but test and falsify
+- **Iterative deepening** — auto-resolves CONTESTED claims (WEAK → follow-up Deep Dive)
+- **Domain stress-test questions** — mandatory adversarial questions per domain
+- **Temporal Diff (UPDATE mode)** — re-research a topic and get claim-by-claim comparison with previous consensus
+- **Bilingual synthesis** — EN + any second language
+
+## 4 Domains
+
+| Domain | When | What it adds |
+|--------|------|-------------|
+| **Health** | Health, nutrition, pharmacology | GRADE hierarchy, PICO framework, MEDICAL_REVIEWER |
+| **Macro** | Energy, geopolitics, macro trends | Forecast audit, scenario analysis, MACRO_REVIEWER |
+| **Company** | Companies, niches, competitors | PROFIT framework, unit economics audit, MARKET_REVIEWER, Problem Prioritization Matrix |
+| **Science** | Academic topics, replications | Reproducibility audit, METHODOLOGY_REVIEWER |
+
+Domain is auto-detected from topic keywords, or can be specified explicitly.
+
+## Agent Roles
+
+| Role | Count | Purpose |
+|------|-------|---------|
+| **SCOUT** | 4-5 | Broad literature search, each with unique reasoning style |
+| **CRITIC** | 1 | Cross-stream contradictions, bias audit, weak evidence |
+| **METHODOLOGIST** | 1 | Domain-specific evidence quality (GRADE for health, forecast audit for macro, reproducibility for science) |
+| **DEEP DIVER** | 2-3+ | Hypothesis testing + domain stress-test questions. Auto-spawns on CONTESTED claims |
+| **SYNTHESIZER** | 1 | Integration across all sources into coherent document |
+| **INTERACTION MAPPER** | 1 | Cross-domain interactions that change recommendations |
+| **DOMAIN_REVIEWER** | 1 | Domain-specific review: MEDICAL / MACRO / MARKET / METHODOLOGY |
+| **FACT-CHECKER** | 1 | Top-15 numerical claims verification |
+| **CITATION_VERIFIER** | script | Python API check against Semantic Scholar / PubMed / CrossRef |
+| **TEMPORAL DIFF** | 0-1 | Compares new consensus with previous version (UPDATE mode) |
+| **ACTION MAPPER** | 1 | Converts findings into actionable updates |
+
+## Research Modes
+
+| Mode | Output | When to use |
+|------|--------|-------------|
+| **personalized** (default) | `synthesis.md` | Specific question for your context |
+| **consensus** | `consensus_reference.md` | Building knowledge base (population-level truth) |
+| **consensus+interactions** | consensus + `interaction_map.md` | Cross-effects matter |
+| **full** | All three documents | Deep investigation |
 
 ## Installation
 
-Copy the skill file to your Claude Code commands directory:
-
 ```bash
-# Project-level (recommended)
+# Clone this repo
+git clone https://github.com/tonyazhuuki/deep-research-skill.git
+
+# Copy to your project
 mkdir -p .claude/commands
-cp research.md .claude/commands/
+cp deep-research-skill/research.md .claude/commands/
+cp -r deep-research-skill/research/ .claude/commands/research/
 
-# Global (available in all projects)
+# Or copy globally (available in all projects)
 mkdir -p ~/.claude/commands
-cp research.md ~/.claude/commands/
-```
-
-## Quick Start
-
-```bash
-# Basic research (personalized mode, auto-priority)
-/research "impact of sleep on cognitive performance"
-
-# Consensus reference (universal, no personalization)
-/research "vitamin D supplementation" high 6 consensus
-
-# Full research (consensus + interactions + personalized)
-/research "omega-3 fatty acids" high 8 full
+cp deep-research-skill/research.md ~/.claude/commands/
+cp -r deep-research-skill/research/ ~/.claude/commands/research/
 ```
 
 ## Configuration
 
-Set these in your project's `CLAUDE.md`:
+1. Copy the template:
+   ```bash
+   cp .claude/commands/research/context_template.md .claude/commands/research/context.md
+   ```
 
-```markdown
-## Research Configuration
-- OUTPUT_DIR: ./research/           # Where to save research files
-- USER_CONTEXT: ./profile/me.md    # Optional user profile for personalization
-- BILINGUAL: true                   # Enable bilingual output
-- SECONDARY_LANGUAGE: es            # Translation language
+2. Edit `context.md` with your data:
+   - File paths to your profiles, lab results, protocols
+   - Key biomarkers (if health/nutrition research)
+   - Genetic variants (if relevant)
+   - Preferred output language
+
+3. Run:
+   ```bash
+   /research creatine safety high 4h consensus
+   ```
+
+Without `context.md`, the skill works in generic mode (no personalization).
+
+## File Structure
+
 ```
-
-Or just run `/research` — it works with sensible defaults (output to `./research_output/`, no personalization, English only).
-
-## Modes
-
-| Mode | Deliverables | Best for |
-|------|-------------|----------|
-| **personalized** | synthesis.md | "What should I specifically do about X?" |
-| **consensus** | consensus_reference.md | "What does science say about X?" (reusable) |
-| **consensus+interactions** | consensus_reference.md + interaction_map.md | "What are the cross-effects?" (nutrients, genetics) |
-| **full** | All three above | Deep dive: evidence base + interactions + personal protocol |
-
-## Agent Roles
-
-| Role | Count | When | Purpose |
-|------|-------|------|---------|
-| ORCHESTRATOR | 1 (Claude) | Always | Coordinates everything, writes reflections |
-| SCOUT | 4-5 | Cycle 1 | Broad literature search, each with unique reasoning style |
-| CRITIC | 1 | After Cycle 1 | Finds contradictions, weak evidence, missing angles |
-| STATISTICIAN | 1 | Auto for health | Grades study methodology (A-D) |
-| DEEP DIVER | 2-3 | Cycle 2 | Closes specific gaps from CRITIC review |
-| SYNTHESIZER | 1 | Cycle 3 | Integrates all findings into coherent synthesis |
-| INTERACTION MAPPER | 1 | consensus+interactions/full | Maps cross-effects invisible in single-outcome analysis |
-| DOMAIN_REVIEWER | 1 | Auto for health | Clinical safety check (dosages, interactions) |
-| FACT-CHECKER | 1 | Always | Verifies top-15 numerical claims |
+.claude/commands/
+├── research.md              ← Main entry point (run with /research)
+└── research/
+    ├── SKILL.md             ← Overview + quick start
+    ├── agents.md            ← Agent role descriptions
+    ├── prompts.md           ← Full prompt templates
+    ├── cycle1.md            ← Cycle 1 (SCOUTs + quality gates)
+    ├── cycle2.md            ← Cycle 2 (Deep Dives + convergence)
+    ├── cycle3.md            ← Cycle 3 (Synthesis + verification)
+    ├── finalize.md          ← Finalization checklist
+    ├── context_template.md  ← Template (copy to context.md)
+    ├── context.md           ← Your private config (gitignored)
+    ├── domains/
+    │   ├── health.md        ← Health domain adapter
+    │   ├── macro.md         ← Macro domain adapter
+    │   ├── company.md       ← Company domain adapter
+    │   └── science.md       ← Science domain adapter
+    └── examples/
+        ├── example_output_tree.txt
+        └── example_synthesis_excerpt.md
+```
 
 ## Output Structure
 
+A completed research produces:
+
 ```
-research_output/creatine_safety/
-├── _PROGRESS_LOG.md           # 3 cycles, 2 reflections, convergence check
-├── stream_a_rcts.md           # SCOUT A (analytical style)
-├── stream_b_mechanisms.md     # SCOUT B (contrarian style)
-├── stream_c_interactions.md   # SCOUT C (mechanistic style)
-├── stream_d_populations.md    # SCOUT D (systems style)
-├── stream_e_practical.md      # SCOUT E (pragmatic style)
-├── _critic_review.md          # Adversarial review of all streams
-├── _methods_review.md         # Study methodology grades
-├── deep_dive_1_*.md           # Gap closure from Cycle 2
-├── deep_dive_2_*.md
-├── synthesis.md               # Main output (10 sections, 300-600 lines)
-├── consensus_reference.md     # Universal evidence reference (if consensus mode)
-├── interaction_map.md         # Cross-effect map (if interactions mode)
-├── _domain_review.md          # Safety check (if health domain)
-├── _fact_check.md             # Numerical verification (always)
-├── unknowns_and_next.md       # What we don't know + next experiments
-├── data/                      # CSV datasets
-│   ├── rcts_data.csv
-│   └── dose_response_data.csv
-├── figures/                   # Visualizations (300 DPI PNG)
-│   ├── dose_response.png
-│   └── evidence_heatmap.png
-└── scripts/                   # Python analysis scripts
-    ├── analysis.py
-    └── visualize.py
+YYYY_MM_topic_name/
+├── _PROGRESS_LOG.md           # Log + 2 reflections + hypotheses
+├── synthesis.md               # Final synthesis EN
+├── synthesis_ru.md            # Translation (if configured)
+├── consensus_reference.md     # Population-level truth (consensus/full mode)
+├── interaction_map.md         # Cross-domain interactions (full mode)
+├── unknowns_and_next.md       # Known unknowns + next experiments
+├── _critic_review.md          # CRITIC output
+├── _methods_review.md         # METHODOLOGIST output
+├── _domain_review.md          # Domain reviewer output
+├── _fact_check.md             # FACT-CHECKER output
+├── _citation_audit.md         # CITATION_VERIFIER output
+├── _temporal_diff.md          # TEMPORAL DIFF (UPDATE mode only)
+├── _action_map.md             # ACTION MAPPER output
+├── stream_a_*.md ...          # Cycle 1 streams
+├── deep_dive_a_*.md ...       # Cycle 2 deep dives
+├── data/*.csv                 # Structured data
+├── figures/*.png              # Visualizations (300 DPI)
+└── scripts/*.py               # Analysis scripts
 ```
 
-## Methodology
+## Dependencies
 
-Based on [Eric Jang's iterative research approach](https://blog.ericjang.com/), enhanced with:
+**Required:**
+- Claude Code CLI (`claude`)
 
-1. **Structured Adversarial Ensemble** — not a single agent, but 10-15 specialized roles with distinct objectives and constraints
-2. **Condorcet independence** — SCOUTs are isolated from each other, preventing confirmation bias
-3. **Diverse reasoning styles** — 5 styles (analytical, contrarian, mechanistic, systems, pragmatic) reduce inter-agent error correlation
-4. **Convergence checking** — quantified agreement rate determines if data is sufficient for synthesis
-5. **Mandatory quality gates** — CRITIC + FACT-CHECKER are always required; STATISTICIAN and DOMAIN_REVIEWER auto-activate for health topics
+**Optional (for Cycle 3 scripts):**
+- Python 3.10+ with `matplotlib`, `pandas`, `numpy`
 
-The pipeline works because of well-established principles from ensemble ML and team science:
-- **Ensemble decorrelation** (diverse prompts reduce correlated errors)
-- **Adversarial review** (CRITIC acts as cross-inhibition)
-- **Delphi iteration** (3 cycles with mandatory reflections)
-- **Boosting-like sequential correction** (each cycle corrects the previous)
+## Changelog
 
-## Cost Estimate
+### v4.2 (2026-03)
+- Temporal Diff (UPDATE mode) — re-research with claim-by-claim comparison
 
-| Mode | Agents | Approximate Cost |
-|------|--------|-----------------|
-| personalized (low priority) | 8-10 | $3-5 |
-| consensus | 10-12 | $5-8 |
-| full (high priority) | 13-15 | $8-12 |
+### v4.1 (2026-03)
+- Domain stress-test questions (mandatory adversarial questions per domain)
+- Iterative deepening on CONTESTED claims (auto-spawn follow-up Deep Divers)
+- Anti-pattern guards per domain
 
-Costs depend on topic complexity and Claude model used. These estimates assume Claude Sonnet for subagents.
+### v4.0 (2026-02)
+- 4 domain adapters: health, macro, company, science
+- METHODOLOGIST replaces STATISTICIAN (domain-specific evidence grading)
+- DOMAIN_REVIEWER: MEDICAL / MACRO / MARKET / METHODOLOGY
+- PROFIT framework for company domain
+- Problem Prioritization Matrix for company domain
 
-## Personalization
+### v3.8 (2026-02)
+- Assumption Killer, Field Consensus Map, So What Test
+- Public-ready: removed personal data, added SKILL.md
 
-The skill works at three levels depending on how much context you provide:
+### v3.7 (2026-02)
+- Progressive context disclosure (modular file loading)
+- Hypothesis-driven cycles with brainstorming
 
-| Level | What you provide | What you get |
-|-------|-----------------|-------------|
-| **No context** | Nothing — just run `/research` | Universal evidence (consensus mode). Still valuable. |
-| **Basic profile** | Demographics, goals, raw lab numbers | Personalized synthesis with your data factored in |
-| **Full context** | Labs + interpreted profiles + genetics + protocols | Maximum personalization: dosing, genetic modifiers, interaction checks |
-
-### Setting up your profile
-
-1. Copy the template: `cp profile_template.md my_profile.md`
-2. Fill in what you have — leave empty fields as-is (the skill ignores them)
-3. Set `USER_CONTEXT` in your `CLAUDE.md`:
-
-```markdown
-## Research Configuration
-- USER_CONTEXT: ./my_profile.md
-```
-
-See [`profile_template.md`](profile_template.md) for the full template.
-
-### Raw data vs. interpreted profiles
-
-**Raw lab numbers** (e.g., "Ferritin: 6.19 ng/mL") are useful, but **interpreted profiles** are far more valuable. An interpreted profile contains context, targets, trends, and genetic modifiers — not just a number.
-
-If you already have health analysis documents (cardiovascular risk assessment, lipid panel interpretation, biomarker tracking sheets), add their paths in the "Interpreted Profiles" section of your profile. The skill will read them and use the richer context for personalization.
-
-Don't have interpreted profiles? No problem — raw numbers work fine. The skill will interpret them based on population references.
-
-### Adjusting for your domain
-
-The skill auto-detects domain from keywords and adjusts:
-- **Stream topics** (what SCOUTS search for)
-- **Quality gates** (which reviewers activate)
-- **Evidence grading** (RCT-based vs observational tiers)
-
-You can also add custom domain mappings by editing the domain table in `research.md`.
-
-## Example Outputs
-
-See the `examples/` directory for sanitized excerpts from real research:
-- [`synthesis_example.md`](examples/synthesis_example.md) — Exercise outcomes synthesis (first 120 lines)
-- [`consensus_reference_example.md`](examples/consensus_reference_example.md) — Exercise consensus reference (first 100 lines)
-
-## Credits
-
-- Research methodology inspired by [Eric Jang](https://blog.ericjang.com/)
-- Multi-agent approach informed by ensemble ML (Dietterich 2000), Delphi method (Dalkey & Helmer 1963), and team science (Hong & Page 2004)
-- Built with [Claude Code](https://docs.anthropic.com/en/docs/claude-code) by [Anthropic](https://anthropic.com)
+### v3.2 (2026-01)
+- Initial public release (monolithic research.md)
+- 10 agent roles, 3 cycles, 4 research modes
 
 ## License
 
