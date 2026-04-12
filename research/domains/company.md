@@ -409,6 +409,19 @@ Map to user's files:
 
 ---
 
+## Coverage Taxonomy (company)
+
+Before launching SCOUTs, verify every relevant dimension has a home:
+
+- [ ] Value chain: R&D, **operations/back-office**, sales, marketing, support, **compliance/legal**, **HR/talent**
+- [ ] Stakeholders: customers, competitors, suppliers, regulators, investors, employees
+- [ ] Business model: revenue streams, cost structure, unit economics, **churn/retention**
+- [ ] Market: TAM/SAM/SOM, growth drivers, **adjacent markets**, substitutes
+- [ ] Risk: regulatory, competitive, execution, **talent/hiring**, macro exposure
+- [ ] **"Boring but decisive" check** — compliance costs, integration friction, hiring timelines, support burden = often decide winners. Covered?
+
+---
+
 ## Deep Diver Stress-Test Questions (company)
 
 > MANDATORY: Each Deep Diver must answer ≥2 of these questions relevant to their topic.

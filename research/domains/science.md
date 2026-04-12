@@ -417,6 +417,19 @@ Map to user's files:
 
 ---
 
+## Coverage Taxonomy (science)
+
+Before launching SCOUTs, verify every relevant dimension has a home:
+
+- [ ] Theory levels: foundational principles, current SOTA, emerging/speculative
+- [ ] Evidence types: RCTs/experiments, observational, computational/simulation, **null findings**, **replication attempts**
+- [ ] Methodology: dominant paradigm, **alternative approaches**, measurement tools
+- [ ] Applications: near-term, long-term, **adjacent fields** that use this knowledge
+- [ ] Meta-science: reproducibility crisis, p-hacking prevalence, pre-registration status, **funding structure**
+- [ ] **"Boring fundamentals" check** — textbook knowledge that constrains the exciting stuff, calibration studies, measurement validation. Covered?
+
+---
+
 ## Deep Diver Stress-Test Questions (science)
 
 > MANDATORY: Each Deep Diver must answer ≥2 of these questions relevant to their topic.

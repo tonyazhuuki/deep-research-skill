@@ -49,6 +49,16 @@ Options:
 - `--fresh` — skip the question, force FRESH mode (ignore any matches)
 - No flag + no match → standard pipeline (no question asked)
 
+## 1b. Coverage Check (MANDATORY before launching SCOUTs)
+
+Before finalizing stream topics, verify COMPLETENESS:
+- **Enumerate the full taxonomy** of the domain being researched (e.g., for food: all major food groups — vegetables, fruits, nuts, seeds, legumes, grains, dairy, meat, fish, eggs, oils, beverages, fermented, spices)
+- **Check each category has a home** in at least one stream
+- **Flag any "boring but important" items** that might be skipped because they're not controversial or novel (e.g., yogurt, turkey, buckwheat — not exciting but high-evidence)
+- If any category is orphaned → either add to an existing stream or create an additional stream
+
+This prevents the "novelty bias" where SCOUTs only cover what's interesting/controversial and miss staple foods.
+
 ## 2a. SCOUTs (parallel)
 
 1. Create `_PROGRESS_LOG.md`

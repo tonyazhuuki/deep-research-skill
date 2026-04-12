@@ -248,6 +248,18 @@ Fertility/Hormones, Chronic pain/Mobility
 
 ---
 
+## Coverage Taxonomy (health)
+
+Before launching SCOUTs, verify every relevant category has a home in at least one stream:
+
+- [ ] Food groups: vegetables, fruits, nuts/seeds, legumes, **dairy**, **meat/poultry**, fish/seafood, eggs, oils, grains, fermented, beverages, spices
+- [ ] Supplement categories: vitamins, minerals, amino acids, herbals, probiotics
+- [ ] Lifestyle: exercise modalities, sleep, stress, circadian
+- [ ] Interactions: drug×nutrient, nutrient×nutrient, condition-specific (IDA, genetics)
+- [ ] **"Boring staples" check** — yogurt, turkey, rice, potatoes, oats = high-evidence but low-novelty. Covered?
+
+---
+
 ## SCOUT Overrides (health)
 
 ### Search Framework: PICO

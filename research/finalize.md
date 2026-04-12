@@ -33,6 +33,7 @@
 3. **Backlinks** — add to affected files
 4. **Health MOC** — update if it exists
 5. **Previous consensus** (UPDATE mode only): ensure `_previous_consensus_[YYYY_MM].md` is archived in new research directory
+6. **`food_evidence_scale.md`** — if research covers food/nutrient/supplement, add or update entry in `01_library/research/nutrition/food_evidence_scale.md` (correct Tier by evidence grade, update `updated:` frontmatter)
 
 ## 5c. Git Commit + Push + Notification + Viewer
 

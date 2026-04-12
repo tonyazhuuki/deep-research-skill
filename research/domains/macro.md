@@ -405,6 +405,18 @@ Map to user's files:
 
 ---
 
+## Coverage Taxonomy (macro)
+
+Before launching SCOUTs, verify every relevant sector/dimension has a home:
+
+- [ ] Sectors: energy, tech, **agriculture**, **water/utilities**, manufacturing, finance, healthcare, real estate, transport, defense
+- [ ] Dimensions: supply, demand, pricing, regulation, geopolitics, demographics, technology disruption
+- [ ] Geographies: US, EU, China, **emerging markets**, commodity exporters
+- [ ] Time horizons: near-term (1-2yr), medium (3-5yr), long (10+yr)
+- [ ] **"Boring infrastructure" check** — utilities, ports, rail, water treatment = low-novelty but high-impact. Covered?
+
+---
+
 ## Deep Diver Stress-Test Questions (macro)
 
 > MANDATORY: Each Deep Diver must answer ≥2 of these questions relevant to their topic.
