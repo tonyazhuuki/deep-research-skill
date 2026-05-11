@@ -169,6 +169,29 @@ Rank from most to least consequential.
 
 This is NOT the same as bias detection (Section 2) or logical errors (Section 3). Those check INDIVIDUAL streams for mistakes. This checks what ALL streams take as GIVEN and never question.
 
+### 9. Cascade Logic Check (Cross-Conclusion Coherence)
+
+For each key conclusion or recommendation across ALL streams, trace the chain of consequences 2-3 steps forward. Ask: "If conclusion X is true, does conclusion Y still hold?"
+
+Format for each chain:
+- **Conclusion:** [state it]
+- **Step 1:** [immediate consequence]
+- **Step 2:** [second-order consequence]
+- **Step 3:** [third-order consequence]
+- **Conflict found:** YES/NO
+- **If YES:** which other conclusion is undermined, and how severely
+
+Build an INTERACTION MATRIX between the top conclusions:
+
+| If TRUE -> | Conclusion 1 | Conclusion 2 | Conclusion 3 | ... |
+|------------|-------------|-------------|-------------|-----|
+| C1 impact  | --          | strengthens/weakens/neutral | ... | ... |
+| C2 impact  | ...         | --          | ... | ... |
+
+Minimum: 5 cascade chains. Priority: conclusions that sound like RECOMMENDATIONS TO ACT ON (e.g., "B2B is better than B2C", "enter market X", "avoid strategy Y"). These are where undetected contradictions cause the most real-world damage.
+
+Flag any conclusion where the cascade reveals it is CONDITIONALLY TRUE (true only if another conclusion is false) — the synthesis must reflect this conditionality.
+
 Style: rigorous, skeptical. If you can dismantle a finding — dismantle it.
 Confidence for each observation.
 ```
@@ -326,6 +349,47 @@ Context: [what is already known from Cycle 1]
 Hypothesis predictions: [ORCHESTRATOR: what must be true if H is correct]
 
 ## Work Structure
+
+### 0. Personal Data Verification (MANDATORY for N=1 / personalized hypotheses)
+
+> **Rule (v3.9, added 2026-05-11):** If the hypothesis touches user's personal context (biomarker, behavior, wearable metric, intervention adherence), you MUST query the available personal data sources BEFORE searching literature. Do NOT outsource verification to user.
+
+**Read first:** `/Users/zhuuki/Cursor/Second Brain/90_meta/personal_data_sources_map.md` — master index of available sources.
+
+**For each personal-context claim in the hypothesis:**
+1. **Identify** which data source could test it:
+   - Biomarker trend → `05_personal/health/data/labs/` + PDFs (check newer PDFs not yet ingested!) + `profile/biomarkers/*_historical_tracking.md`
+   - Training load, recovery, sleep, HRV → `05_personal/health/data/whoop/mcp_sync/full/*.json` (WHOOP MCP)
+   - Life events, decisions, sessions → `04_therapy/`, `05_personal/calls/`, `06_projects/_meetings/` (Plaud)
+   - Genetics → `05_personal/health/profile/genetics/`
+   - Active interventions → `05_personal/health/profile/regimen/supplements.md`, `protocols/`
+   - Goals/temporal → `00_vision/goals/`, `log.md`
+
+2. **Query** the data with concrete tools:
+   ```bash
+   # Labs
+   grep -nE "(biomarker)" 05_personal/health/data/labs/*.md
+   ls -lt 05_personal/health/data/labs/**/*.PDF  # check PDF freshness
+   # WHOOP MCP JSON
+   ./tools/venv/bin/python3 -c "import json; d=json.load(open('05_personal/health/data/whoop/mcp_sync/full/Strain.json'))['data']; ..."
+   # SQL on CSV
+   python3 tools/numguard.py sql --path FILE.csv --infer --query "SELECT ..."
+   ```
+
+3. **Compute** the actual answer with numbers (not "could be X" — actual values).
+
+4. **Report** findings in deep_dive output:
+   - Add MANDATORY section `## Personal Data Verification` with what was queried + what was found
+   - Cite source paths explicitly (e.g., `Strain.json MCP last sync May 11`)
+   - Include numbers, ranges, comparisons (baseline vs target window)
+
+5. **Escalate** to user ONLY if data is genuinely missing or ambiguous after vault check.
+
+**Bad pattern ❌:** "Could exercise have contributed to ferritin drop? Maybe check WHOOP."
+
+**Good pattern ✅:** "Pulled WHOOP MCP Strain.json для Mar 4-Apr 28 vs Jan-Feb baseline: avg strain +13%, days strain>15 +64%, Z4-5 min/week +22%, padel +25% sessions. Hepcidin-spiking load was elevated. Estimated contribution: -1.5 to -3 ng/mL ferritin (15-30% of -9.37 regression)."
+
+**If the hypothesis is purely about literature/mechanism (no personal context):** skip this section, proceed to §1.
 
 ### 1. Search for Evidence FOR the Hypothesis
 - Which studies support the predicted mechanism?
@@ -545,6 +609,21 @@ IMPORTANT:
 - Priority: interactions that OVERTURN a recommendation
 - Rank by impact: those affecting >10% of the population first
 
+## Personal Data Verification (MANDATORY for personalized research, v3.9)
+
+> Rule added 2026-05-11. Source: `/Users/zhuuki/Cursor/Second Brain/90_meta/personal_data_sources_map.md`
+
+For EACH interaction that maps to user's profile (user-specific Active Interactions section):
+1. **Verify activation condition** against actual user data:
+   - Genotype claim → check `05_personal/health/profile/genetics/`
+   - Biomarker threshold → check `05_personal/health/data/labs/last_results.md` + latest PDFs + `profile/biomarkers/`
+   - Behavioral claim (training load, sleep, adherence) → query WHOOP MCP JSON or Plaud
+   - Active supplement/protocol → check `profile/regimen/supplements.md` + `protocols/`
+2. **Cite source path** in each user-relevant interaction entry (Mechanism table line: "Activation verified via [path]: [value]")
+3. **Quantify** the personal magnitude where possible (not "if biomarker is high" but "your value X = active/inactive")
+
+DO NOT outsource to user with "check your data". Pull from vault and compute.
+
 Final section: "## Matrix: When Consensus Is Not Enough"
 — Table: [Patient profile] → [Which interactions to check] → [What changes]
 
@@ -585,6 +664,74 @@ Format:
 ## 💊 Interaction matrix (interaction table)
 
 Style: clinical, conservative. When in doubt — mark ⚠️, not ✅.
+```
+
+---
+
+## DEVIL'S ADVOCATE (Cross-Conclusion Coherence Check)
+
+> **When:** After SYNTHESIZER produces synthesis.md / consensus_reference.md, BEFORE FACT-CHECKER.
+> **Why:** Catches logical contradictions between conclusions that individual agents miss because each hypothesis is tested in isolation.
+> **Mandatory:** YES — all domains, all modes.
+
+```
+You are a DEVIL'S ADVOCATE agent in a swarm research team.
+
+Your SOLE job: find logical contradictions between the research conclusions. Every other agent has a constructive role — yours is purely destructive. You succeed when you BREAK conclusions.
+
+Read:
+- synthesis.md or consensus_reference.md (the final output)
+- _PROGRESS_LOG.md (hypothesis verdicts)
+
+Create file: _devils_advocate.md
+
+## 1. Hypothesis Interaction Matrix (MANDATORY)
+
+Build a matrix of ALL hypothesis verdicts. For every pair (Hi, Hj), answer:
+"If Hi is true, does Hj become MORE true, LESS true, or IMPOSSIBLE?"
+
+| If TRUE → | H1 | H2 | H3 | H4 | H5 | ... |
+|-----------|----|----|----|----|----|----|
+| H1 impact | -- | ?  | ?  | ?  | ?  | ?  |
+| H2 impact | ?  | -- | ?  | ?  | ?  | ?  |
+
+For every cell marked WEAKENS or IMPOSSIBLE:
+- State the contradiction explicitly
+- Assess severity: MINOR (wording fix) / MODERATE (conclusion needs qualifier) / CRITICAL (verdict may flip)
+- Propose a corrected formulation
+
+## 2. Cascade Chains on Recommendations
+
+For EVERY actionable recommendation in the synthesis (anything that says "do X", "prefer X over Y", "enter market X", "avoid Y"):
+
+- **Recommendation:** [quote it]
+- **Assumes:** [what must be true for this to be good advice]
+- **But the research also says:** [find a finding that undermines the assumption]
+- **Cascade:** trace 2-3 steps of consequences
+- **Verdict:** STANDS / NEEDS QUALIFIER / CONTRADICTED
+
+Minimum: check ALL recommendations. Do not skip any.
+
+## 3. Temporal Coherence
+
+Check if conclusions that are true NOW will still be true under the research's own projected future scenarios:
+- "X is the best strategy" — is it still best under Bear scenario? Under Black Swan?
+- "Market will do Y" — does the recommendation assume Base case only?
+
+## 4. Stakeholder Inversion
+
+For each recommendation, ask: "Who LOSES if this advice is followed, and would they agree with the underlying data?"
+- If the loser would dispute the data → the conclusion may rest on contested evidence
+- If the loser would agree with data but dispute the interpretation → the conclusion may be opinion, not finding
+
+## 5. Summary: Corrections Required
+
+| # | Conclusion/Recommendation | Problem Found | Severity | Proposed Fix |
+|---|--------------------------|---------------|----------|-------------|
+
+The ORCHESTRATOR MUST apply all CRITICAL and MODERATE fixes to the synthesis BEFORE finalization.
+
+Style: adversarial, rigorous, zero politeness. Your job is to break things. If you find nothing wrong, you failed.
 ```
 
 ---
@@ -830,6 +977,21 @@ TODO block format (SMART goals):
    - **New research ideas** → write to `90_meta/research_queue.md`
    - **⚠️ NEVER write research recommendations directly into monthly goal files** (march_2026.md, april_2026.md etc.). Monthly files contain only CURRENT MONTH actions. If something is time-bound to a specific month, add a ONE-LINE reference with a link to where the full recommendation lives.
    - **Consensus index** → always update `01_library/research/consensus_index.md`
+   - **Flywheel chain** → if research produced measurable N=1 outcome, update or create chain in `01_library/research/_flywheel/chains/` AND add `## 📈 Realized Outcomes (Data Flywheel)` backlink section to this research's `_action_map.md` (per `_flywheel/README.md` spec)
+
+## Personal Data Source Verification (MANDATORY, v3.9 added 2026-05-11)
+
+> **Rule:** Before writing TODOs that reference user's current biomarker values, training state, supplement adherence — PULL the actual current value from data sources, не использовать стейл данные из synthesis.
+
+**Verification checklist before writing each TODO:**
+- Latest biomarker value → check `05_personal/health/data/labs/last_results.md` + latest PDFs in `data/labs/**/*.PDF`
+- Current training state → query `05_personal/health/data/whoop/mcp_sync/full/Strain.json` for last 4 weeks
+- Current supplement state → check `05_personal/health/profile/regimen/supplements.md` headers
+- Active protocols → list `05_personal/health/protocols/*.md`
+
+**Source map:** `/Users/zhuuki/Cursor/Second Brain/90_meta/personal_data_sources_map.md`
+
+If TODO threshold (e.g., "if ferritin <10 → action X") differs from current state, mark the TODO with whether it currently TRIGGERS or NOT based on actual data.
 
 ## Rules
 

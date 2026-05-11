@@ -6,7 +6,8 @@
 
 1. Based on Reflection 1 + CRITIC, choose 2-3 directions with maximum information value
 2. Launch DEEP DIVER agents (prompt from `research/prompts.md` section "## DEEP DIVER")
-3. Output: `deep_dive_[x]_[topic].md` (5-15K words) + CSV
+3. **Personal data verification rule (v3.9, mandatory for personalized/N=1 research):** Each DD prompt MUST include the user's `personal_data_sources_map.md` reference + instruction to query relevant data BEFORE searching literature. Orchestrator: pass explicit data-source paths most relevant to the hypothesis (e.g., WHOOP MCP Strain.json for training hypothesis, latest lab PDFs for biomarker hypothesis, Plaud transcripts for behavior hypothesis). See `prompts.md` DEEP DIVER §0 for the canonical instruction text.
+4. Output: `deep_dive_[x]_[topic].md` (5-15K words) + CSV — each DD's output MUST include `## Personal Data Verification` section if hypothesis touched personal context
 
 ## Reflection 2 + Convergence + Hypothesis Verdict (MANDATORY)
 

@@ -72,6 +72,21 @@ Use the domain-specific reviewer prompt from `research/domains/[domain].md`:
 - **company:** MARKET_REVIEWER → `_market_review.md`
 - **science:** METHODOLOGY_REVIEWER → `_methodology_review.md`
 
+## 4d-bis. DEVIL'S ADVOCATE (MANDATORY ALWAYS)
+
+> Runs AFTER SYNTHESIZER + DOMAIN_REVIEWER, BEFORE FACT-CHECKER.
+> Can run in parallel with DOMAIN_REVIEWER if needed to save time.
+
+Prompt from `research/prompts.md` section "## DEVIL'S ADVOCATE".
+Reads synthesis/consensus_reference + _PROGRESS_LOG.md (hypothesis verdicts).
+Checks cross-conclusion coherence: does conclusion X undermine conclusion Y?
+Output: `_devils_advocate.md`
+
+**After DEVIL'S ADVOCATE:**
+- Apply all CRITICAL and MODERATE corrections to synthesis/consensus_reference
+- If any hypothesis verdict needs a qualifier (e.g., "SUPPORTED, but conditionally on H1 being false"), update the verdict table
+- Log corrections in `_PROGRESS_LOG.md`
+
 ## 4e. FACT-CHECKER (MANDATORY ALWAYS)
 
 Prompt from `research/prompts.md` section "## FACT-CHECKER".

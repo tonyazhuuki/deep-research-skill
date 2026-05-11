@@ -14,10 +14,11 @@
 | **SYNTHESIZER** | Cycle 3 | 1 | Yes | synthesis.md |
 | **INTERACTION MAPPER** | After consensus_reference | 1 | consensus+interactions / full (health/nutrition) | interaction_map.md |
 | **DOMAIN_REVIEWER** | After SYNTHESIZER | 1 | **ALWAYS** (health→MEDICAL, macro→MACRO, company→MARKET, science→METHODOLOGY) | _domain_review.md |
-| **FACT-CHECKER** | After SYNTHESIZER | 1 | **ALWAYS** | _fact_check.md |
+| **DEVIL'S ADVOCATE** | After SYNTHESIZER | 1 | **ALWAYS** | _devils_advocate.md |
+| **FACT-CHECKER** | After DEVIL'S ADVOCATE | 1 | **ALWAYS** | _fact_check.md |
 | **ACTION MAPPER** | Last | 1 | **ALWAYS** | _action_map.md + TODOs in protocols/goals |
 
-**Total agents:** 10-15 (depends on domain and mode)
+**Total agents:** 11-16 (depends on domain and mode)
 
 ---
 
