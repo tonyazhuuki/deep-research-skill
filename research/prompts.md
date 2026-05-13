@@ -352,9 +352,16 @@ Hypothesis predictions: [ORCHESTRATOR: what must be true if H is correct]
 
 ### 0. Personal Data Verification (MANDATORY for N=1 / personalized hypotheses)
 
-> **Rule (v3.9, added 2026-05-11):** If the hypothesis touches user's personal context (biomarker, behavior, wearable metric, intervention adherence), you MUST query the available personal data sources BEFORE searching literature. Do NOT outsource verification to user.
+> **Rule (v3.10, updated 2026-05-13):** If the hypothesis touches user's personal context (biomarker, behavior, wearable metric, intervention adherence), you MUST query the available personal data sources BEFORE searching literature. Do NOT outsource verification to user.
 
-**Read first:** `/Users/zhuuki/Cursor/Second Brain/90_meta/personal_data_sources_map.md` — master index of available sources.
+**🚨 Data-grade distinction (v3.10 addition — critical):** Not all vault data is equal evidence:
+
+| Data type | Confidence | Example | Action |
+|---|---|---|---|
+| **MEASUREMENT** (lab value, WHOOP record, biomarker reading, dated event) | HIGH | "Cu 77.6 µg/dL (Apr 28 PDF 636731)" | Use directly as fact |
+| **DOCUMENTED ASSUMPTION** (working hypothesis in vault file, planned protocol, file classification without validating data) | MEDIUM | "acne_protocol.md classifies as hormonal — but androgen panel pending" | **Check: is validating data pending? If yes, DOWNGRADE verdict to CONDITIONAL** |
+| **USER-STATED PREFERENCE** (Plaud transcript, vision file decision, stated goal) | MEDIUM | "User said in therapy 2026-02-17: prefer not isotretinoin" | Check freshness; preferences change |
+| **DERIVED INFERENCE** (calculation, model output, projection) | MEDIUM-LOW | "HOMA-IR ~1.06 from glucose 88 + insulin 4.87" | Note calculation method |
 
 **For each personal-context claim in the hypothesis:**
 1. **Identify** which data source could test it:
@@ -387,7 +394,13 @@ Hypothesis predictions: [ORCHESTRATOR: what must be true if H is correct]
 
 **Bad pattern ❌:** "Could exercise have contributed to ferritin drop? Maybe check WHOOP."
 
-**Good pattern ✅:** "Pulled WHOOP MCP Strain.json для Mar 4-Apr 28 vs Jan-Feb baseline: avg strain +13%, days strain>15 +64%, Z4-5 min/week +22%, padel +25% sessions. Hepcidin-spiking load was elevated. Estimated contribution: -1.5 to -3 ng/mL ferritin (15-30% of -9.37 regression)."
+**Good pattern ✅:** "Pulled WHOOP MCP Strain.json для Mar 4-Apr 28 vs Jan-Feb baseline: avg strain +13%, days strain>15 +64%, Z4-5 min/week +22%, padel +25% sessions. Hepcidin-spiking load was elevated. Estimated contribution: -1.5 to -3 ng/mL ferritin (15-30% of -9.37 regression). [MEASUREMENT-grade]"
+
+**v3.10 Bad pattern ❌:** Treating documented assumption as measurement-grade fact:
+> "acne_protocol.md classifies as hormonal acne → therefore Thakker 2015 PCOS meta NULL applies → REJECT NAC for skin (verdict 0.82)"
+
+**v3.10 Good pattern ✅:** Honor data-grade distinction:
+> "acne_protocol.md classifies as hormonal acne (DOCUMENTED ASSUMPTION — androgen panel pending per labs_checklist queue) → IF hormonal confirmed: Thakker NULL applies; IF NOT confirmed: inflammatory subtype has weak positive signal (Sahib 2012 small unreplicated). Verdict: CONDITIONAL REJECT pending phenotype confirmation, not definitive 0.82."
 
 **If the hypothesis is purely about literature/mechanism (no personal context):** skip this section, proceed to §1.
 
