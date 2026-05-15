@@ -59,6 +59,48 @@ Before finalizing stream topics, verify COMPLETENESS:
 
 This prevents the "novelty bias" where SCOUTs only cover what's interesting/controversial and miss staple foods.
 
+## 1c. Claims Map (MANDATORY for supplements/interventions/single-agent research)
+
+> **Rule added 2026-05-15** (origin: user feedback after 3 consecutive scoping misses in same session — H. pylori, Anti-TPO, sleep/nighttime calm). Memory: `feedback_dont_prune_claims_before_mapping.md`.
+
+For research on a **specific supplement, drug, intervention, or single agent** (e.g., "should I take X?"), the food-taxonomy approach in §1b is insufficient. Build a **Claims Map** instead.
+
+### The rule
+**Map ALL universal claims FIRST. Filter to user N=1 SECOND.** Never pre-prune claims at scope step based on "probably not relevant to user" — that creates systematic blind spots. The SYNTHESIZER (v3.10 Universal-Landscape-before-Persona rule) filters at synthesis time; SCOUTS must map the full universe.
+
+### Required claim categories (enumerate exhaustively at Step 1)
+
+For each agent under study, list every claim across these 5 categories:
+
+1. **Clinical (well-studied):** Every indication with ≥1 published RCT or meta-analysis. Include positive AND failed/null indications. Examples: lipid effect, glycemic effect, BP effect, thyroid effect, fertility, GDM prevention, depression, OCD, anxiety, panic, sleep, pregnancy outcomes, cancer-adjuvant, autoimmune.
+
+2. **Wellness / influencer / "longevity" culture (often weak evidence):** Claims promoted by supplement marketing, podcasts, biohackers, even if evidence base is thin. Examples: brain fog, energy, mitochondrial, hair/skin, cognitive enhancement, anti-aging, stress/cortisol modulation, "calm/sleep cocktail" stacks, mood support, immune support, gut/microbiome, hormone balance. **DON'T skip these because they're marketing-driven** — user encounters them in the wild and needs informed assessment.
+
+3. **Mechanism-driven hypotheses:** What does pharmacology suggest is possible, even without trials? Receptor binding, pathway modulation, cellular effects. Useful for steel-man and falsification.
+
+4. **Drug / supplement interactions:** Every plausible interaction direction — CYP, transporters, receptor competition, additive effects, antagonisms. Include rare/severe (e.g., lithium-inositol PARADOX, MAOI-tyramine).
+
+5. **Population-specific claims:** Pregnancy/lactation, pediatric, geriatric, specific genotype, specific comorbidity. Often have separate evidence base.
+
+### Output format at Step 1 (paste into _PROGRESS_LOG.md)
+
+A numbered exhaustive list (1-N), categorized. Then ASSIGN each claim to a stream (or note "not relevant to this scope" with reason). Never drop a claim silently.
+
+### Red flag self-check
+
+Before launching SCOUTs, ask:
+- Does my scope feel **narrow and clean**? → Likely over-pruned. Re-broaden.
+- Am I optimizing for the **user's apparent biomarkers** before knowing what claims exist? → Wrong order. Map universe first.
+- Did I include **wellness/influencer claims** even if I expect them to be weak? → User will encounter them; explain them.
+- Did I include **failed / null indications**? → Important context (e.g., scyllo-inositol failed Alzheimer's trials — must be discriminated from myo-inositol claims).
+- Did I include the **inverse safety direction** (e.g., supplementation harm in specific populations)? → Bipolar/lithium-inositol paradox is the canonical example.
+
+### When to compress the map
+
+For very narrow research (e.g., "is dose X safe at duration Y for indication Z" — already-scoped follow-up), the Claims Map can be compressed to the relevant subset. But the DEFAULT for any new supplement/intervention question is the FULL map.
+
+This prevents "narrow-scope-from-personalization bias" where SCOUTs only cover what looks user-relevant and miss claims user will encounter elsewhere.
+
 ## 2a. SCOUTs (parallel)
 
 1. Create `_PROGRESS_LOG.md`
