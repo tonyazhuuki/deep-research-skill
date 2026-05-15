@@ -73,6 +73,58 @@ Folate: XX ng/mL
 
 ---
 
+## Cross-Protocol Consistency Check (v3.10, added 2026-05-14)
+
+> Used by the CROSS_PROTOCOL_REVIEWER agent. Ensures dietary/supplement recommendations in any research don't conflict with YOUR other active protocols.
+>
+> **First-run setup:** if you skip this block, the agent will (a) try to auto-discover your protocols via glob, then (b) ask you 3 questions interactively. Saving the block here is recommended — saves time on every future research.
+
+```yaml
+cross_protocol_check:
+  enabled: true
+  discovery_level: 1  # 1=hardcoded (this block), 2=auto-discover, 3=ask user
+
+  # === LEVEL 1 — recommended setup (fill in YOUR paths) ===
+  active_protocols_dir: "<path/to/your/protocols/>"  # e.g., "health/protocols/" or "auto-discover"
+  latest_labs_file: "<path/to/labs/latest.md>"        # or "auto-discover"
+  supplements_file: "<path/to/supplements.md>"        # optional
+  decisions_ledger: "<path/to/decisions.md>"           # optional, for tracking superseded recommendations
+
+  # === Biomarker constraints (fill in YOUR current state, or leave for auto-pull) ===
+  omega_panel:
+    file_pattern: "<path or glob for omega panel>"
+    current_w6_w3_ratio: <number>     # e.g., 4.5 — auto-pull or manual
+    target_w6_w3_ratio: 4.0
+    current_dgla: <number>             # if FADS1 T/T relevant
+
+  # === Active constraints — toggle ON ones that apply to you ===
+  constraints:
+    # Examples (uncomment ones that apply):
+    # - sat_fat_low                # if you manage cholesterol / heart disease
+    # - omega_6_low                # if W6/W3 ratio elevated
+    # - retinol_ul_pregnancy        # if planning pregnancy in next 6-12 months
+    # - iron_antagonism_check       # if on iron supplementation
+    # - vegan / vegetarian          # diet preference
+    # - low_sodium / dash           # if BP management
+    # - diabetic / low_glycemic     # if T2D / pre-diabetic
+    # - low_fodmap / ibs            # if GI sensitivity
+    # - kidney_disease_low_phosphorus / low_potassium  # if CKD
+
+  optional_constraints:
+    # Custom constraints not covered above (free text)
+    # - "avoid nightshades for autoimmune"
+    # - "low histamine"
+```
+
+**Onboarding:** if this is your first /research run and you haven't filled this block, the orchestrator will ask:
+1. Where are your active health protocols stored? (paste paths or 'none' or 'auto-discover')
+2. Where are your latest lab values? (paste path or paste key numbers directly)
+3. Any active constraints? (free text — examples: 'pregnancy planning', 'vegan', 'low sodium')
+
+Save responses here for next runs.
+
+---
+
 ## Domains and default streams
 
 | Domain | Additional context | Default streams |

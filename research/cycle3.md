@@ -10,7 +10,7 @@
 
 Launch SYNTHESIZER (prompt from `research/prompts.md` section "## SYNTHESIZER").
 It reads ALL md files and creates:
-- **personalized/full:** `synthesis.md` (10 sections: TL;DR, Evidence Landscape, Key Findings, Protocol Assessment, Projections, Decision Tree, Interactions, Monitoring, Confidence, Data Quality)
+- **personalized/full:** `synthesis.md` (12 sections per v3.10: 0-Preface + 1-Universal Landscape + 2-TL;DR + 3-Evidence Landscape + 4-Key Findings WITH Bridge Rule + Universal-vs-Personal map + 5-Protocol Assessment + 6-Projections + 7-Decision Tree + 8-Interactions + 9-Monitoring + 10-Confidence + 11-Data Quality + 12-Glossary). Bilingual synthesis_[lang].md ALSO includes So What Test + Read-back Test at end.
 - **consensus/full:** `consensus_reference.md` (format from `research/domains/[domain].md` "## Consensus Template")
   - **health:** organized by OUTCOMES (mortality, CVD, etc.)
   - **macro:** Market Structure → Drivers → Supply → Scenarios → Metrics
@@ -63,6 +63,36 @@ After the SYNTHESIZER produces the new consensus_reference.md (or synthesis.md),
 Launch if mode is consensus+interactions or full. For health/nutrition — recommended with any consensus.
 Prompt from `research/prompts.md` section "## INTERACTION MAPPER".
 Output: `interaction_map.md`
+
+## 4c-bis. CROSS_PROTOCOL_REVIEWER (v3.10 NEW, MANDATORY if research has dietary/supplement recommendations)
+
+> Runs AFTER SYNTHESIZER + INTERACTION MAPPER, BEFORE DOMAIN_REVIEWER.
+> Skip ONLY if research has zero dietary/supplement/food recommendations (rare; mostly applies to abstract methodology / pure-mechanism research).
+
+Launch CROSS_PROTOCOL_REVIEWER (prompt from `research/prompts.md` section "## CROSS_PROTOCOL_REVIEWER").
+
+**3-level discovery (waterfall):**
+1. **context.md** — reads `cross_protocol_check` block (preferred, for users who configured it)
+2. **Auto-discovery** — globs `**/health/protocols/*.md`, `**/labs/**/last_results*.md`, `**/regimen/supplements.md`
+3. **Ask user** — prompts user for paths + constraints (one-time onboarding; suggests saving to context.md)
+
+If discovery fails (Level 3 also empty): synthesis MUST carry a visible warning at top of TL;DR — "⚠️ Cross-protocol consistency NOT verified".
+
+**Output:** `_cross_protocol_review.md` with:
+- Discovery trace
+- Active constraints applied
+- Conflict matrix (full table: each food × each constraint × verdict)
+- CRITICAL / MODERATE / MINOR conflicts
+- Required corrections to synthesis
+- Compatibility-approved alternatives
+
+**After CROSS_PROTOCOL_REVIEWER:**
+- If CRITICAL conflicts → re-run SYNTHESIZER with conflict list (corrections pass; max 2 cycles)
+- If MODERATE conflicts → ORCHESTRATOR applies inline Edit corrections to synthesis directly
+- If zero/MINOR conflicts → insert "Cross-Check Disclosure" line into synthesis (after TL;DR or in Evidence Landscape section)
+- Log applied corrections to `_PROGRESS_LOG.md`
+
+This step prevents the failure mode where SYNTHESIZER optimizes single-topic and recommends foods that violate the user's OTHER active protocols (cholesterol sat-fat / omega-6 ratio / retinol-pregnancy / iron antagonism).
 
 ## 4d. DOMAIN_REVIEWER (MANDATORY — all domains)
 

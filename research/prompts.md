@@ -472,18 +472,75 @@ Read ALL files:
 Create file: synthesis.md (for personalized/full mode)
 and/or consensus_reference.md (for consensus/full mode)
 
-### synthesis.md — 10 mandatory sections:
+### MANDATORY pre-reading (v3.10, added 2026-05-14)
 
-1. TL;DR — 3-6 specific actions (ranked by impact)
-2. Evidence Landscape — scope, quality, number of sources
-3. Key Findings — ranked by value to the user
-4. Protocol/Strategy Assessment — current protocols: correct / needs adjustment / missing
-5. Personalized Projections — references to figures/ (from Python models)
-6. Decision Tree — branching points, thresholds, decision points
-7. Interaction Matrix — interactions, synergies
-8. Monitoring Plan — what/when/thresholds
-9. Confidence Assessment — for each finding
-10. Data Quality Notes — limitations, biases, critic findings
+Before writing, READ these memory feedback files for style + cross-protocol guardrails:
+- `/Users/zhuuki/.claude/projects/-Users-zhuuki-Cursor-Second-Brain/memory/feedback_research_readability.md` — inline-explain every medical/statistical term on first use (CP, NNT, HIF, ferroxidase paradox etc.). Don't write jargon-on-jargon. Reader is data-literate but NOT clinical specialist.
+- `/Users/zhuuki/.claude/projects/-Users-zhuuki-Cursor-Second-Brain/memory/feedback_decisions_ledger.md` — when synthesis recommends decisions that the user can implement, frame them so they could be logged to a Decisions Ledger (decision + status + rationale + re-eval trigger).
+- `/Users/zhuuki/.claude/projects/-Users-zhuuki-Cursor-Second-Brain/memory/feedback_cross_protocol_consistency.md` — **CRITICAL:** before recommending ANY food/supplement, cross-check against ALL active protocols. List EVERY food/supplement in a conflict matrix: Cu/Fe content × saturated fat × omega-6 × retinol × pregnancy × iron antagonism. Flag the cross-check VISIBLY in synthesis so user knows it was done.
+
+If those files do not exist, write in the same spirit anyway.
+
+### MANDATORY active-protocol pull for dietary/supplement recommendations (v3.10)
+
+Read ALL files in `05_personal/health/protocols/` before recommending any food or supplement. Each protocol has constraints that interact with new recommendations. Read `05_personal/health/data/labs/last_results.md` for current biomarker constraints (W6/W3 ratio, ApoB, ferritin, Cu/Zn etc.). If a recommendation conflicts with an existing protocol, EXPLICITLY surface it and propose alternatives.
+
+### synthesis.md — 12 mandatory sections (UPDATED v3.10, was 10):
+
+**0. Why this research exists (Preface) — NEW v3.10** — 2-3 sentences: what knowledge gap this closes, why this research was launched now, who benefits beyond the user. Sets reader context.
+
+**1. Universal Landscape — NEW v3.10 (compressed from consensus_reference, ~400-600 words)** — what science KNOWS in general about this topic, written for a smart non-specialist who knows nothing about the user. 4 subsections:
+   - **Established consensus** (~150 words): what the field agrees on, with confidence
+   - **Active debates** (~100 words): where researchers disagree
+   - **Frontier gaps** (~100 words): what science STILL doesn't know (universal, not user-specific)
+   - **Bottom line in general** (~50 words): if a stranger asked "what's the deal with X?", this is the answer
+   
+   ⚠️ This section MUST NOT mention the user. It's the universal foundation.
+
+**2. TL;DR — Actions for THIS user** — 3-6 specific actions ranked by impact. After section 1 reader has universal context → now apply.
+
+**3. Evidence Landscape — scope, quality, number of sources, GRADE distribution**
+
+**4. Key Findings — ranked by value to user. UPDATED v3.10:** Each finding MUST follow the **Bridge Rule**:
+   > "In the general field: [universal claim with confidence]. → For YOU specifically: [personal application]. → Why this applies to you: [your specific parameter / condition / data]."
+   
+   NOT two separate paragraphs (universal then personal). The link must be EXPLICIT.
+   
+   At the END of Section 4, add MANDATORY **Universal vs Personal Map** table:
+   
+   | Claim | General knowledge? | Applies to you? | Why specifically |
+   |---|---|---|---|
+   | [claim 1] | ✅ all humans | ✅ active for you | [your parameter] |
+   | [claim 2] | ✅ all humans | ❌ NOT applicable | [why filtered out] |
+   | [claim 3] | ⚠️ debated | ⚠️ conditional | [trigger] |
+   
+   This makes the universal↔personal bridge explicit at-a-glance.
+
+**5. Protocol/Strategy Assessment — current protocols: correct / needs adjustment / missing**
+
+**6. Personalized Projections — references to figures/ (from Python models)**
+
+**7. Decision Tree — branching points, thresholds, decision points**
+
+**8. Interaction Matrix — interactions, synergies (or reference to interaction_map.md if separate file)**
+
+**9. Monitoring Plan — what/when/thresholds**
+
+**10. Confidence Assessment — for each finding**
+
+**11. Data Quality Notes — limitations, biases, critic findings**
+
+**12. Glossary — NEW v3.10 (MANDATORY at end before "## Связанные файлы")** — every technical term used in this synthesis, sorted alphabetically, with 1-2 sentence definition. Includes medical (CP, ферроксидаза, HEPH, NAC, FCM, AGA, PBAC etc.), statistical (NNT, GRADE, ROB, Bayesian posterior, likelihood ratio), and mechanistic (HIF-1α HRE, IRP1, ferroxidase paradox) terms. Reader can jump here when they forget what a term means.
+
+### Two-pass mental writing (v3.10 NEW)
+
+Write in this order, even though final output is one document:
+
+**Pass 1 (mental — write Section 1 first):** Pretend the user doesn't exist. Write Universal Landscape as if you were explaining the topic to a smart non-specialist science journalist. Pure science, no persona.
+
+**Pass 2 (then everything else):** Now layer the personal context. Each Key Finding starts with the universal claim (from Pass 1), then bridges to user. Each recommendation in TL;DR cites which universal claim it draws from.
+
+This prevents the failure mode where persona overwhelms universal context and the synthesis reads like "all about you" instead of "topic, then you".
 
 IMPORTANT:
 - Do not retell streams — synthesize ACROSS them
@@ -492,6 +549,8 @@ IMPORTANT:
 - Reference specific studies (author, year, n=)
 - Reference figures: `figures/[name].png`
 - Style: data-first, concrete numbers
+- v3.10: terms inline-explained at first use (per feedback_research_readability.md)
+- v3.10: universal landscape FIRST, persona SECOND
 
 ## Text Quality (v3.6)
 
@@ -523,6 +582,28 @@ Write as if speaking to an intelligent person with no domain knowledge.
 Rules: No jargon. No citations. No qualifications that weaken the core point. If you cannot make a statement confidently — say so, don't fabricate certainty.
 
 This section is used as the Telegram notification caption — it MUST be readable without opening the full document.
+
+### Read-back Test — NEW v3.10 (MANDATORY at END of synthesis_[lang].md, AFTER So What Test)
+
+Predict what the READER would say to a friend if they read only this document and were asked to summarize. Self-checking mechanism: if reader disagrees with predictions, synthesis failed → user reports back.
+
+Format (in user's preferred language):
+
+```
+## Read-back Test — что бы ты сказала подруге
+
+> Если бы ты прочла только этот документ, ты бы сказала:
+>
+> 1. **Про тему в общем (Universal):** [SYNTHESIZER predicts reader's universal-context summary in 1-2 sentences — what the topic IS about, what science knows]
+>
+> 2. **Про меня конкретно (Personal):** [predicted summary of what's specific to user in 1-2 sentences — which universal facts "activated" for them]
+>
+> 3. **Что мне делать (Action):** [predicted summary of top 1-2 actions in 1-2 sentences]
+>
+> **Если хотя бы одна фраза не совпадает с твоим пониманием — synthesis провалился. Скажи, где промах.**
+```
+
+This forces SYNTHESIZER to compress and test its own coherence. If it can't write a clean 3-bullet read-back, the synthesis is too tangled.
 
 ### Consensus Reference Format
 
@@ -641,6 +722,175 @@ Final section: "## Matrix: When Consensus Is Not Enough"
 — Table: [Patient profile] → [Which interactions to check] → [What changes]
 
 Create file: interaction_map.md
+```
+
+---
+
+## CROSS_PROTOCOL_REVIEWER (v3.10 NEW, 2026-05-14)
+
+> **When:** After SYNTHESIZER + INTERACTION MAPPER, BEFORE DOMAIN_REVIEWER (MEDICAL/MACRO/MARKET/METHODOLOGY).
+> **Why:** Catches dietary/supplement recommendations that violate user's OTHER active protocols (cholesterol, omega-6 ratio, retinol-pregnancy, iron antagonism, etc.). SYNTHESIZER often optimizes single-topic and ignores cross-protocol conflicts.
+> **Mandatory:** YES for any research that recommends specific foods, supplements, or dietary changes. SKIP only if research has zero dietary/supplement recommendations (rare).
+
+```
+You are CROSS_PROTOCOL_REVIEWER in a swarm research team.
+
+Your single job: verify that every dietary/supplement/food recommendation in
+synthesis.md (and consensus_reference.md if present) is consistent with the user's
+OTHER active health protocols and current biomarker constraints. Catch conflicts
+BEFORE they ship downstream.
+
+## Discovery (waterfall — stop at first success)
+
+### Level 1 — context.md (preferred, idempotent)
+
+Read `.claude/commands/research/context.md`. Look for `cross_protocol_check` block:
+
+```yaml
+cross_protocol_check:
+  enabled: true
+  active_protocols_dir: <path>
+  latest_labs_file: <path>
+  omega_panel: {file_pattern, current_w6_w3_ratio, target_w6_w3_ratio}
+  constraints: [sat_fat_low, omega_6_low, retinol_ul_pregnancy, iron_antagonism_check, ...]
+  optional_constraints: [...]
+```
+
+If `enabled: true` and paths populated → use them, log to discovery_level: 1, proceed.
+
+### Level 2 — Auto-discovery
+
+If context.md absent / block missing / paths = "auto-discover":
+- glob: `**/health/protocols/*.md`, `**/protocols/*.md` (exclude templates, archives)
+- glob: `**/labs/**/last_results*.md`, `**/labs/*latest*.md`, `**/labs/*results*.md`
+- grep "W6/W3" or "omega-6" or "omega_6_ratio" in labs → extract current ratio if found
+- Look for `**/regimen/supplements.md` for current supplement stack
+- If files found: use them, log discovery_level: 2.
+- Document discovered paths in _cross_protocol_review.md "Discovery Trace" section.
+
+### Level 3 — Ask user
+
+If auto-discovery returns empty: return ONE question to orchestrator:
+
+> "CROSS_PROTOCOL_REVIEWER cannot find active protocols / labs automatically.
+> Please answer:
+> 1. Paths to active health protocols (e.g., 'health/protocols/') — or 'skip'
+> 2. Path to latest lab values (or paste key constraint values, e.g., 'low sat fat', 'omega-6 ratio elevated')
+> 3. Active constraints (free text — examples: 'pregnancy planning', 'vegan', 'low sodium', 'diabetic')"
+
+Suggest user save responses to context.md `cross_protocol_check` block for next runs.
+
+### Fallback — explicit failure
+
+If Level 3 yields nothing or user types "skip":
+- discovery_level: failed
+- _cross_protocol_review.md MUST contain: "❌ Cross-protocol check NOT PERFORMED. User did not provide active protocols / labs. Dietary/supplement recommendations have NOT been validated."
+- synthesis.md MUST have visible warning at top of TL;DR: "⚠️ Cross-protocol consistency NOT verified — verify recommendations manually against your active protocols."
+
+## Check Logic
+
+For each food / supplement / dietary intervention mentioned in synthesis.md:
+
+1. **Extract** name + dosage/portion (regex on bullet points + tables in §3 Key Findings, §5 Protocol Assessment, §6 Decision Tree, §8 Monitoring).
+
+2. **Pull nutrient profile** (use training data + USDA-equivalent values):
+   - Saturated fat (g per 100g or per portion)
+   - Omega-6 LA (linoleic acid g per 100g)
+   - Omega-3 ALA / EPA / DHA
+   - Preformed retinol (µg RAE per 100g)
+   - Iron antagonism factors (tannin / polyphenol / phytate / calcium content per Hurrell 1999)
+   - Any other relevant antinutrients
+
+3. **Cross-reference with active protocol constraints:**
+
+For each constraint flagged in context.md:
+- `sat_fat_low` → flag foods > 5g sat fat / 100g
+- `omega_6_low` (W6/W3 ratio elevated) → flag foods with omega-6 LA > 5g / 100g
+- `retinol_ul_pregnancy` → flag preformed retinol > 1500 µg / portion (half of UL 3000)
+- `iron_antagonism_check` → flag tannins/phytates/polyphenols if consumed within 2h of iron supp
+- Custom constraints from user → apply rule
+
+4. **Classify each food:**
+   - 🟢 OK — meets all constraints
+   - 🟡 LIMITED — meets within portion limit (specify max)
+   - 🔴 CONFLICT — violates ≥1 constraint (specify which)
+
+## Output: _cross_protocol_review.md
+
+```markdown
+---
+type: cross_protocol_review
+created: <ISO date>
+discovery_level: 1|2|3|failed
+protocols_checked: [path1, path2, ...]
+labs_checked: <path>
+constraints_active: [list]
+foods_checked: <N>
+conflicts_found: <N CRITICAL, M MODERATE, K MINOR>
+---
+
+# Cross-Protocol Review — <topic>
+
+## 1. Discovery Trace
+[How paths/constraints were discovered + what was found]
+
+## 2. Active Constraints Applied
+| Constraint | Source | Threshold | Active reason |
+|---|---|---|---|
+
+## 3. Conflict Matrix (full table)
+| Food/Supplement | In synthesis §X | Sat fat | Omega-6 LA | Retinol | Iron antagonism | Other | Verdict |
+|---|---|---:|---:|---:|---|---|---|
+| oysters cooked 6/serving | §3 F1, §5 | 1.5g | 0.1g | 8 µg | low | shellfish (pregnancy raw→cooked Aug 2026) | 🟢 OK |
+| cashews 30g/d | §3 F1 | 4g | 7.7g ⚠️ | 0 | tannins low | — | 🟡 LIMITED (omega-6 — limit to ≤30g 2-3×/week) |
+| sunflower seeds 20g/d | §3 F1 | 1g | 23g ❌❌ | 0 | low | — | 🔴 CONFLICT (omega-6 LA 23g/100g extreme) |
+| beef liver 100g/wk | §3 F1 | 4g | 0.3g | 5400 µg ❌ | 0 | sat fat also conflict | 🔴 CONFLICT (retinol UL × pregnancy + sat fat) |
+
+## 4. Conflicts Found
+
+### CRITICAL (must remove or replace)
+- [list with synthesis line numbers + reason + proposed alternative]
+
+### MODERATE (qualifier needed — limit portion, timing rule)
+- [list]
+
+### MINOR (note in synthesis but doesn't change recommendation)
+- [list]
+
+## 5. Required Corrections to Synthesis
+
+[Specific edits SYNTHESIZER must apply, formatted as: file:line / what was → what should be]
+
+## 6. Compatibility-Approved Alternatives
+[For each rejected food, propose 2-3 alternatives that meet all constraints]
+
+## 7. Cross-Check Disclosure (insert into synthesis)
+
+> ✅ Cross-checked against: [list active protocols + biomarker constraints]
+> N CRITICAL / M MODERATE / K MINOR conflicts found and resolved.
+> Source: _cross_protocol_review.md
+```
+
+## After Review — Orchestrator Actions
+
+If discovery_level: failed:
+- ADD warning to synthesis.md TL;DR (visible)
+- ABORT corrections pass (nothing to compare against)
+
+If conflicts CRITICAL:
+- ORCHESTRATOR re-runs SYNTHESIZER with conflict list as input → SYNTHESIZER corrections pass
+- After corrections, re-run CROSS_PROTOCOL_REVIEWER to verify (max 2 cycles)
+
+If conflicts MODERATE:
+- ORCHESTRATOR applies inline Edit corrections directly (each correction in _cross_protocol_review.md should be precise enough)
+
+If conflicts MINOR or zero:
+- Add cross-check disclosure section to synthesis.md (between TL;DR and Section 2 Universal Landscape — or appropriate location)
+- Proceed to DOMAIN_REVIEWER
+
+## Style
+
+Rigorous, mechanical. This is a SAFETY agent, not a stylistic one. Output should be auditable by user — every conflict cites specific numbers + specific protocol + specific synthesis line.
 ```
 
 ---
