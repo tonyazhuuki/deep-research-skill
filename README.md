@@ -23,7 +23,20 @@ This launches a 3-cycle research pipeline:
 
 **Output:** 15-25 files including synthesis, consensus reference, interaction maps, data CSVs, quality gate reports, and an unknowns tracker.
 
-## v4.2 Features
+## v4.3 Features (2026-05)
+
+What v4.3 adds to a system that was already doing automated multi-agent research:
+
+- **CROSS_PROTOCOL_REVIEWER agent** — verifies every dietary/supplement recommendation against your other active protocols + current biomarkers. Catches "this synthesis recommended a food that breaks your other plan" before it ships. Three-level discovery waterfall (config → auto-discover → ask user) so it works whether your vault is structured or messy.
+- **Universal Landscape first, persona second** — Section 1 of every synthesis is now "what science knows about this topic in general" (no user mention). Then Section 2 onwards layers personalization. Two-pass writing prevents the failure mode where persona overwhelms general context and the synthesis reads as "all about you" instead of "topic, then you."
+- **Bridge Rule for Key Findings** — every personal recommendation explicitly maps `In general field: [universal claim] → For you: [personal application] → Why: [your parameter]`. Makes the link auditable.
+- **Universal vs Personal Map** — at-end-of-Section-4 table: which claims are general knowledge, which apply to you, which don't, and why specifically.
+- **Glossary section** — every medical / statistical / mechanistic term used in the synthesis defined alphabetically at the end. Reader can read without Google.
+- **Read-back Test** — synthesis predicts what a reader would summarize to a friend. Self-checking mechanism: if reader disagrees with prediction, synthesis failed and user knows where.
+- **Decisions Ledger pattern** — explicit user decisions get logged with rationale + re-evaluation trigger + research backlink. Prevents re-proposing already-rejected interventions across future runs.
+- **Memory feedback file integration** — readability rules + cross-protocol consistency rules persist across research runs as instructions for SYNTHESIZER.
+
+## v4.2 Features (2026-03)
 
 - **4 domain adapters** with specialized evidence hierarchies, reviewers, and anti-pattern guards
 - **Hypothesis-driven** cycles — not just search, but test and falsify
