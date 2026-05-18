@@ -117,6 +117,29 @@ Output: `_devils_advocate.md`
 - If any hypothesis verdict needs a qualifier (e.g., "SUPPORTED, but conditionally on H1 being false"), update the verdict table
 - Log corrections in `_PROGRESS_LOG.md`
 
+## 4d-ter. HUMANIZER (MANDATORY for personalized mode, added 2026-05-18)
+
+> Runs AFTER SYNTHESIZER + DEVIL'S ADVOCATE corrections, BEFORE FACT-CHECKER.
+> Mandatory ONLY for personalized mode (synthesis_[lang].md output). SKIP for pure consensus_reference mode (universal document, technical OK).
+> Origin: 2026-05-18 user feedback that syntheses kept reading as doctor-tier even with v3.10 plain-language SYNTHESIZER rules. Dedicated humanize pass catches drift.
+
+Prompt from `research/prompts.md` section "## HUMANIZER".
+
+Reads: synthesis_[lang].md (the user-facing translation, target language version).
+
+Fixes 5 categories:
+1. English/Latin/scientific code-mix in target-language prose
+2. Agent / framework jargon surfacing (Stream A, Gate B, Trigger A, Smart Trial, Bridge Rule, F1/F6, GRADE labels)
+3. Unexplained medical/statistical terms on first use
+4. Doctor-style sentence structure
+5. Verdicts without WHY attached
+
+Output: same synthesis_[lang].md edited in place + brief report of anti-patterns caught.
+
+**Extra attention to TL;DR section (§2)** — this is what user sees in Telegram caption. First ~800 chars must be self-contained, common names only, plain language, WHY built into verdicts.
+
+**After HUMANIZER:** Verify TL;DR readable in isolation (Telegram caption test). If still doctor-tier in TL;DR specifically, re-run with stricter prompt OR apply orchestrator surgical edits.
+
 ## 4e. FACT-CHECKER (MANDATORY ALWAYS)
 
 Prompt from `research/prompts.md` section "## FACT-CHECKER".
