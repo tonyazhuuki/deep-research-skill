@@ -167,6 +167,26 @@ python3 tools/citation_verifier.py \
 - SUSPICIOUS → double-check manually (SUSPICIOUS ≠ hallucination)
 - Reliability score = VERIFIED / total_checked (target: ≥70%)
 
+## 4e-ter. SOURCES_EXTRACTOR (MANDATORY ALWAYS)
+
+> Runs AFTER FACT-CHECKER + CITATION_VERIFIER. Last consolidation pass before bilingual synthesis.
+
+Prompt from `research/prompts.md` section "## SOURCES_EXTRACTOR".
+Walks every file in the research folder, harvests every URL verbatim, dedupes, grades each source (A/A−/B+/B/C), captures named-only references, and builds a claim→source back-reference table for the top-15 numerical findings.
+
+Output: `_sources.md`
+
+**Why mandatory:** sources currently live scattered across deep dives and streams. Readers (and downstream consumers — website builds, content republishing, third-party fact-check) see only synthesis.md. Without `_sources.md` they cannot trace claims to URLs without manually opening 8-12 sibling files.
+
+**Honesty rule:** never fabricate URLs. If a source is cited by name without a link, mark `(URL not in source data)` and list it in the "Named-only" section. This is the same rule that applies to the website's sources block — it should originate at the skill level, not as a post-hoc patch.
+
+```bash
+# Quick sanity check the URLs landed in _sources.md
+grep -oE 'https?://[^ )"]+' "[research_dir]"/*.md | sort -u > /tmp/_all_urls.txt
+grep -oE 'https?://[^ )"]+' "[research_dir]/_sources.md" | sort -u > /tmp/_sources_urls.txt
+diff /tmp/_all_urls.txt /tmp/_sources_urls.txt  # should be empty if extraction complete
+```
+
 ## 4f. Bilingual synthesis (MANDATORY)
 
 Check `context.md` for `preferred_language`. If set (e.g., `ru`):

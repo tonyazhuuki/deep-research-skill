@@ -174,6 +174,69 @@
 
 ---
 
+## SOURCES_EXTRACTOR (citation consolidator)
+
+**Analogy:** librarian who indexes every footnote in a manuscript.
+
+- Walks every file in the research folder: streams, deep dives, synthesis, fact-check, critic, methods.
+- Extracts every URL verbatim via `grep -oE 'https?://[^ )"]+'`. Deduplicates.
+- Grades each source by type: A (SEC/statutory/audited/on-chain), A− (central banks, IMF/BIS, peer-reviewed academic), B+ (industry analyst, legal advisory, audited trackers), B (trade press, aggregator), C (vendor, self-reported).
+- Captures sources cited by name without URL as "named-only" entries (Chainalysis, McKinsey, internal vendor reports) — flagged explicitly, never fabricated.
+- Builds a **claim → source** back-reference table for the top numerical findings (the same set FACT-CHECKER audited).
+- Output: `_sources.md` at the research-folder root.
+
+**Why a separate agent:** sources live in deep dives and streams, but readers see synthesis.md. Without consolidation the reader has to dig. Downstream consumers (website builds, content republishing, third-party fact-check) need ONE file. Currently this work has to be done post-hoc.
+
+**MANDATORY ALWAYS** — runs after FACT-CHECKER. Last consolidation pass.
+
+**Output template:**
+
+```markdown
+---
+type: research_sources
+research: YYYY_MM_topic_slug
+created: YYYY-MM-DD
+total_urls: N
+total_named_only: M
+---
+
+# Sources — [Research Title]
+
+## Source-grade summary
+| Grade | Definition | Count |
+|-------|-----------|-------|
+| A     | SEC / statutory / audited / on-chain | N |
+| A−    | Central bank / IMF / BIS / peer-reviewed | N |
+| B+    | Industry analyst / legal advisory | N |
+| B     | Trade press / aggregator | N |
+| C     | Vendor / self-reported | N |
+
+## Grade A — Primary
+| Source | URL | Used for |
+|--------|-----|----------|
+| ... | https://... | [headline claim it supports] |
+
+## Grade A− — Institutional / academic
+...
+
+## Grade B+ / B / C
+...
+
+## Named-only sources (URL not in source data)
+| Source | Referenced in | Claim supported |
+|--------|--------------|-----------------|
+| Chainalysis Crypto Crime Report 2024 | DD-B | $37B stolen since 2011 |
+
+## Claim → Source map (top-15 numerical findings)
+| Claim | Source(s) | Grade |
+|-------|-----------|-------|
+| [verbatim claim from synthesis] | [Source 1], [Source 2] | A blend |
+```
+
+**Honesty rule:** if a URL is not in the source files — mark `(URL not in source data)`. NEVER fabricate URLs.
+
+---
+
 ## Pipeline Order
 
 ```
@@ -196,6 +259,8 @@ Cycle 3:  Python scripts (ORCHESTRATOR)
           MEDICAL_REVIEWER (1, if health/nutrition)
               |
           FACT-CHECKER (1, MANDATORY)
+              |
+          SOURCES_EXTRACTOR (1, MANDATORY) -> _sources.md
               |
           Corrections + bilingual synthesis + unknowns (ORCHESTRATOR)
               |

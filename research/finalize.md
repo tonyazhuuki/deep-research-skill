@@ -16,6 +16,7 @@
 - [ ] `_medical_review.md` (if health/nutrition)
 - [ ] `_fact_check.md` (**MANDATORY**)
 - [ ] `_citation_audit.md` (top 20 citations verified, target: ≥70% VERIFIED)
+- [ ] `_sources.md` (**MANDATORY**) — consolidated citation index built by SOURCES_EXTRACTOR. Grades A/A−/B+/B/C, deduplicated URLs, named-only flagged, claim→source map for top numerical findings. **NEVER fabricate URLs**: if a source is cited by name without a link, mark `(URL not in source data)`. Downstream consumers (site builds, content republishing, third-party fact-check) need this consolidated artifact.
 - [ ] `_action_map.md` (**MANDATORY**) + TODOs in protocols
 - [ ] Confidence per finding
 - [ ] `_temporal_diff.md` (if UPDATE mode — check _PROGRESS_LOG.md for UPDATE_MODE=true)
