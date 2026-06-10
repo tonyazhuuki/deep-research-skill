@@ -39,6 +39,21 @@ Apply at least 2 of these techniques when researching your stream:
 
 ## Structuring the Search
 
+### Company/Niche Domain: Documentation Audit (MANDATORY for company teardowns)
+
+When researching a SPECIFIC company, ALWAYS check primary documentation on their website:
+- **Terms & Conditions** — legal architecture, custody model, liability, refund policy
+- **KYC/AML Policy** — required documents, accepted countries, proof of address requirements, blocked jurisdictions
+- **Security page** — custody architecture (MPC? multisig? custodial?), audits, insurance, bug bounty, last update date
+- **Fees page** — all fees listed (card, swap, withdrawal, FX, subscription)
+- **Supported assets/tokens** — actual list vs marketing claims ("150+" vs real count)
+- **Regulatory documents** — licenses, registrations, compliance frameworks
+- **Referral/affiliate terms** — reward structure, virality mechanics
+
+**Why:** Marketing says one thing, legal docs say another. Contradictions between marketing and T&C = red flags or outdated pages. A security page last updated 4 years ago for a financial product = finding worth reporting.
+
+**Do NOT rely on PR articles or affiliate reviews as primary source for product capabilities. Always verify against the company's own legal documentation.**
+
 For health/medical/nutrition streams, use the PICO framework:
 - **P**opulation: who? (age, sex, condition)
 - **I**ntervention: what? (substance, dosage, protocol)
