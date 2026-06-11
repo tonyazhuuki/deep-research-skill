@@ -16,6 +16,48 @@
 | D | **Systems-thinking** (holist) | "Reason SYSTEMICALLY. Look for feedback loops, interactions, emergent effects, second-order consequences. Ask: 'how does this connect to EVERYTHING else?' Priority: interactions, trade-offs, unintended consequences." |
 | E | **Pragmatic** (practitioner) | "Reason PRAGMATICALLY. For every finding, immediately ask: 'what specifically should be done?' Look for dose-response, NNT/NNH, cost-effectiveness, implementation barriers. Priority: actionable insights, not theoretical knowledge." |
 
+### v4.3 — SCOUT-D (Database) variant — health domain only
+
+For health-domain research, the orchestrator MAY substitute one of A-E with **SCOUT-D** when the topic triggers structured DB lookup (see `domains/health_databases.md` "When this registry is used"). Default substitution: SCOUT-D replaces SCOUT-E (Pragmatic) — both target actionable specificity, SCOUT-D adds machine-grounded variant/drug/trial data.
+
+**SCOUT-D prompt addendum** (appended to the base SCOUT prompt):
+
+```
+You are SCOUT-D (Database-Grounded). In addition to the base SCOUT mandate:
+
+1. Identify queryable entities in the stream topic + user context:
+   - Genes / variants (from query OR from user's genetics files in context.md)
+   - Drugs / supplements (from query OR user's current stack)
+   - Conditions (from query OR diagnosis history)
+
+2. Call ≥2 relevant databases using `tools/research_adapters/db_lookup.py`. Available CLI commands:
+     python3 tools/research_adapters/db_lookup.py clinvar <rsid>
+     python3 tools/research_adapters/db_lookup.py snpedia <rsid>
+     python3 tools/research_adapters/db_lookup.py trials --condition "<X>" --intervention "<Y>"
+     python3 tools/research_adapters/db_lookup.py openfda "<drug>"
+     python3 tools/research_adapters/db_lookup.py reactome <gene_symbol>
+   For each call: capture output, log to `stream_d_db_calls.json`.
+
+3. Produce 4 output files (one extra vs other SCOUTs):
+   - `stream_d_<topic>.md` (narrative integrating DB findings)
+   - `<topic>_data.csv` (flat data)
+   - `stream_d_study_cards.md` (per study_card_health.yaml — cards include DB lookups too)
+   - `stream_d_db_calls.json` (raw machine-readable record of every call — see schema in health_databases.md)
+
+4. Honesty rules — NON-NEGOTIABLE:
+   - DO NOT fabricate DB results. If db_lookup returned nothing, say so in narrative.
+   - If a DB requires a key that's not configured, log the skip with `status: skipped: no_auth`.
+   - Rate-limit failures → retry once (built into db_lookup), then continue gracefully.
+   - Cite source_url from each DB result in `stream_d_<topic>.md`.
+
+5. Trial-grounded recommendations win over abstract-only findings. If `clinical_trials()` returns an active recruiting trial relevant to the user's profile, surface it explicitly with NCT ID + eligibility criteria.
+
+6. For genetic findings: SCOUT-D's lookup must include ALL user-relevant variants mentioned in
+   `context.md` genetics section, even if topic doesn't directly mention them — interaction surface check.
+```
+
+**SCOUT-D substitution rule:** orchestrator checks if topic / user context triggers any of the activation conditions in `health_databases.md` "When this registry is used". If yes → assign SCOUT-D. If not → use the standard 5-style rotation.
+
 ### Base SCOUT Prompt
 
 ```
@@ -98,18 +140,37 @@ This finds articles that keyword search misses.
 
 For each study, note the journal tier. Start with Tier 1, move down if gaps remain.
 
-Create 2 files:
+Create 3 files:
 
-1. `stream_[x]_[topic].md` — 3000-8000 words
+1. `stream_[x]_[topic].md` — 3000-8000 words narrative
    - YAML frontmatter (type: research_stream, created, tags, confidence)
    - Numbered findings with confidence for each
    - Key studies (author, year, n=, design, effect size, journal tier)
    - **PMID** for each study if found via PubMed
+   - **EVERY numerical claim must reference a card_id** from file #3 below — format: `[card_a_03]`
    - At the end: **Search Strategy** — which queries, which databases, how many results
    - Gaps and questions for deeper investigation
 
-2. `[topic]_data.csv` — snake_case columns
+2. `[topic]_data.csv` — flat snake_case columns (for Cycle 3 Python viz/analysis)
    - study, year, design, n, population, intervention, outcome, effect_size, ci_95, p_value, grade, journal_tier, pmid
+
+3. **`stream_[x]_study_cards.md`** — structured cards per domain schema **(NEW in v4.3 — MANDATORY)**
+   - [ORCHESTRATOR: inline the loaded schema content from `templates/study_card_<domain>.yaml`]
+   - **Min cards per stream:** health/company/science=10, macro/creative=8
+   - **Format:** one card per subsection. Markdown table + YAML block at the end of each card.
+   - **Card IDs:** `card_<stream_letter>_<NN>` (e.g., `card_a_03`) — must be unique within the research folder
+   - **Every numerical claim in file #1 must reference at least one card_id from file #3.** This is the audit trail.
+   - **Per-domain rules:**
+     - **health:** GRADE assessment mandatory per card; `relevance_to_user` filled when personalized mode
+     - **macro:** `forecaster_track_record` + ≥2 `baseline_assumptions` mandatory
+     - **company:** raw_quote MUST be verbatim (no paraphrase substitution); sample_size always explicit
+     - **science:** `reproducibility` block mandatory; preprints labeled `peer_reviewed: false`
+     - **creative:** `primary_source_check.direct_observation` mandatory; specific `distinguishing_feature`, no generic adjectives
+   - **Field not reported:** write `not_reported` — do NOT guess
+   - **Leave `methodologist_notes` / `reviewer_notes` empty** — METHODOLOGIST / domain reviewer owns those
+   - **GRADE/grade_rationale mandatory** for every card (health/macro/science/company/creative each have grade field per their schema)
+
+After producing all 3 files, run `ls` to confirm. If file #3 is missing, the pipeline will fail at METHODOLOGIST step.
 ```
 
 ---
@@ -482,7 +543,14 @@ Your role is INTEGRATION. You do NOT search for new data. You take ALL existing
 findings and create a single coherent document.
 
 Read ALL files:
-[ORCHESTRATOR: list paths to ALL md files: streams, deep dives, critic review, methods review, progress log]
+[ORCHESTRATOR: list paths to ALL md files: streams, **stream_*_study_cards.md**, deep dives, critic review, methods review, progress log]
+
+**v4.3 — Study Cards are your citation backbone:**
+- `stream_*_study_cards.md` files contain numbered cards (`card_a_03`, `card_b_11`, etc.) with full structured evidence per study.
+- METHODOLOGIST has filled `methodologist_notes` / `reviewer_notes` in each card — read those flags.
+- **Every numerical claim in synthesis.md MUST include `[card_X_NN]` references** in parentheses immediately after the claim. Example: "Lithium reduced suicide rate by 40% in Texas cohort [card_a_03], replicated in Japan [card_a_07] and Greece [card_b_05]."
+- Claims without card refs are unsourced opinion and will be flagged at FACT-CHECK pass.
+- Mechanistic / theoretical claims without an associated study: cite as `[mechanism, no card]` — surfaces gaps honestly.
 
 Create file: synthesis.md (for personalized/full mode)
 and/or consensus_reference.md (for consensus/full mode)
@@ -536,10 +604,12 @@ Read ALL files in `05_personal/health/protocols/` before recommending any food o
 
 **3. Evidence Landscape — scope, quality, number of sources, GRADE distribution**
 
-**4. Key Findings — ranked by value to user. UPDATED v3.10:** Each finding MUST follow the **Bridge Rule**:
-   > "In the general field: [universal claim with confidence]. → For YOU specifically: [personal application]. → Why this applies to you: [your specific parameter / condition / data]."
+**4. Key Findings — ranked by value to user. UPDATED v3.10 + v4.3 cards:** Each finding MUST follow the **Bridge Rule**:
+   > "In the general field: [universal claim with confidence] [card_X_NN, card_Y_MM]. → For YOU specifically: [personal application]. → Why this applies to you: [your specific parameter / condition / data]."
    
    NOT two separate paragraphs (universal then personal). The link must be EXPLICIT.
+   
+   **v4.3:** the universal claim MUST cite ≥1 supporting card_id from `stream_*_study_cards.md`. Multiple cards = stronger. Zero cards = either mechanistic-only (mark `[mechanism, no card]`) or remove the claim.
    
    At the END of Section 4, add MANDATORY **Universal vs Personal Map** table:
    

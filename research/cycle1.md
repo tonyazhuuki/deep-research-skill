@@ -101,16 +101,86 @@ For very narrow research (e.g., "is dose X safe at duration Y for indication Z" 
 
 This prevents "narrow-scope-from-personalization bias" where SCOUTs only cover what looks user-relevant and miss claims user will encounter elsewhere.
 
+## Step 0c. Pre-Research Data Adapter Detection (v4.3 — NEW)
+
+> Runs AFTER scoping but BEFORE SCOUT launch. Produces `_patient_data_context.md` if applicable.
+> Skipped silently if no adapter triggers fire — pipeline behaves identically to v4.2 in that case.
+
+### Trigger detection
+
+Two activation paths:
+
+1. **CLI flag explicit:**
+   - `/research <topic> --with-data <path>` → genome adapter
+   - `/research <topic> --with-imaging <path>` → imaging adapter (v4.4, not yet active)
+
+2. **Auto-detect from `context.md`:**
+   - If `context.md` declares `patient_data.genome:` block AND topic matches genome keywords (MTHFR, APOE, FADS1, GSK3B, BDNF, pharmacogenomic, drug × gene, neuroprotection, cognitive longevity, lipid, vitamin D, folate, methylation, iron/ferritin, OR matches `rs\d+` pattern), genome adapter activates.
+   - Same logic for imaging when v4.4 lands.
+
+### Adapter invocation (genome — only ACTIVE adapter in v4.3)
+
+If triggered, run:
+
+```bash
+python3 tools/research_adapters/genome_to_context.py \\
+    --topic "<topic>" \\
+    --source "<path from --with-data OR from context.md patient_data.genome.markdown_paths>" \\
+    --out "<research_folder>/_patient_data_context.md"
+```
+
+**Source selection priority:**
+1. `--with-data <path>` if provided
+2. `context.md` → `patient_data.genome.markdown_paths` (directory with interpreted reports)
+3. `context.md` → `patient_data.genome.vcf_path` (raw WGS)
+4. Topic mentions specific data source → ask user one question
+
+**Honest failure:**
+- If genome adapter fails (no source, parse error, all DBs unreachable): write a stub `_patient_data_context.md` with the LIMITATIONS block explaining what's missing. Do NOT proceed silently.
+
+### What SCOUTs do with `_patient_data_context.md`
+
+When file exists, ORCHESTRATOR appends to each SCOUT prompt:
+
+```
+## Patient-Specific Data (v4.3 adapter output)
+
+Read `_patient_data_context.md` in the research folder. It contains:
+- Topic-filtered variants from user's source files
+- ClinVar / SNPedia enrichment where available
+- EXPLICIT LIMITATIONS — surface every limitation in your stream when relevant
+
+Rules:
+- When citing a variant, reference the source file + section it came from
+- For LIMITATIONS-listed variants, DO NOT assume genotype — explicitly state "user data missing"
+- When a variant is relevant to your stream BUT not in `_patient_data_context.md`, propose adding it to the user's genetics workup
+```
+
+If file does NOT exist (no trigger), SCOUTs operate as in v4.2.
+
+### Sanity check before SCOUTs
+
+After Step 0c, the orchestrator confirms:
+- `_patient_data_context.md` exists (or was intentionally skipped)
+- If genome adapter was triggered but produced empty output (0 topic-relevant variants) → flag in `_PROGRESS_LOG.md` as warning, continue
+
 ## 2a. SCOUTs (parallel)
 
 1. Create `_PROGRESS_LOG.md`
-2. Launch 4-5 SCOUT agents (Task tool, subagent_type: general-purpose, run_in_background: true)
-3. Each receives:
+2. **v4.3 — Load study card schema** based on domain:
+   - Read `research/templates/study_card_<domain>.yaml` (e.g., `study_card_health.yaml`)
+   - **Inline the full schema content** into each SCOUT prompt — they need it to produce cards
+3. Launch 4-5 SCOUT agents (Task tool, subagent_type: general-purpose, run_in_background: true)
+4. Each receives:
    - Base prompt from `research/prompts.md` section "## SCOUT"
    - **MANDATORY** unique reasoning style (A=Analytical, B=Contrarian, C=Mechanistic, D=Systems, E=Pragmatic) — style table in `research/prompts.md`
+   - **v4.3:** inlined study card schema for the loaded domain
    - Stream topic and user context (if personalized)
-4. Output: `stream_[x]_[topic].md` (3-8K words) + `[topic]_data.csv`
-5. **After ALL SCOUTs → `ls` — files written? If not → write from output.**
+5. **Output: 3 files per SCOUT (v4.3):**
+   - `stream_[x]_[topic].md` (3-8K words narrative) — every numerical claim references `[card_x_NN]`
+   - `[topic]_data.csv` (flat data for Cycle 3 viz)
+   - **`stream_[x]_study_cards.md`** — ≥N cards per domain schema (health/company/science=10, macro/creative=8)
+6. **After ALL SCOUTs → `ls` — verify all 3 files per stream exist. If `stream_*_study_cards.md` missing for any stream → re-prompt that SCOUT before proceeding to 2b. METHODOLOGIST cannot run without cards.**
 
 ## 2b. CRITIC + METHODOLOGIST (parallel)
 
@@ -121,9 +191,9 @@ Launch CRITIC (mandatory) and METHODOLOGIST (mandatory — ALL domains).
 
 **Domain resolution:** determine domain from topic (health/macro/company/science). See `domains/*.md` for detection keywords. If ambiguous — ask user one question.
 
-Both read ALL `stream_*.md` files.
+Both read ALL `stream_*.md` files. **METHODOLOGIST also reads (PRIMARY) all `stream_*_study_cards.md` files (v4.3).**
 
-Output: `_critic_review.md` + `_methods_review.md`
+Output: `_critic_review.md` + `_methods_review.md` + **updated `stream_*_study_cards.md` with filled `methodologist_notes` / `reviewer_notes` fields (v4.3).**
 
 ## Reflection 1 (MANDATORY) — Hypothesis Generation
 

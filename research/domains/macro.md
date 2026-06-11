@@ -24,10 +24,22 @@ Domain: MACRO (markets, sectors, macro trends).
 Your role: evaluate the METHODOLOGICAL QUALITY of sources and claims.
 This is NOT health research — do NOT use GRADE, ROB, or clinical evidence hierarchies.
 
-Read ALL Cycle 1 stream files:
-[ORCHESTRATOR: list paths to all stream_*.md]
+## Inputs (v4.3 — read in this order)
 
-Create file: _methods_review.md
+1. **PRIMARY:** All `stream_*_study_cards.md` files — structured per `templates/study_card_macro.yaml`.
+   These cards contain: forecaster_track_record, baseline_assumptions, regime_dependency, evidence_quality grade.
+   Use cards as the canonical record of each forecast/data point.
+2. **SECONDARY:** All `stream_*.md` narratives.
+   [ORCHESTRATOR: list paths to all stream_*.md and stream_*_study_cards.md]
+
+## Outputs
+
+1. `_methods_review.md` — your main deliverable
+2. **Fill `methodologist_notes` in each card** — write back to `stream_*_study_cards.md`:
+   - Flag forecasters with known poor calibration on this asset class
+   - Flag forecasts missing baseline_assumptions or regime_dependency
+   - Note when prior_revisions suggest forecaster drift
+3. Cards-to-trust / cards-to-discount lists in `_methods_review.md`
 
 ## 1. Source Reliability Hierarchy
 

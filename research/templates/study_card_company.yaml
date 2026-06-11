@@ -1,0 +1,56 @@
+# Study Card Schema — Company / Niche / Market Domain
+# Loaded when domain = company
+# Used by: SCOUT (produces), MARKET_REVIEWER (reads), DD (reads), SYNTHESIZER (cites card_ids)
+#
+# Critical: this domain preserves VERBATIM customer/user language.
+# Raw quotes are mandatory — paraphrase loses signal.
+
+version: 1.0
+domain: company
+
+# Card ID format: card_<stream>_<n>   e.g., card_b_07
+
+required:
+  meta:
+    source_type: enum                  # interview | survey | usage_data | filing | earnings_call | review_aggregator | forum_post | reddit | telegram | twitter | linkedin | competitor_marketing | gov_filing | regulatory_filing
+    source_url_or_handle: string
+    date: string                       # YYYY-MM-DD
+    geography: string                  # primary market — "US" | "EU" | "Cyprus" | "global" | "MENA"
+
+  signal:
+    customer_segment: string           # specific — "B2B SaaS PMs at Series A startups" not "businesses"
+    sample_size: int_or_string         # explicit: "n=1 interview" | "n=243 survey" | "n=12 review threads"
+    claim_type: enum                   # price_sensitivity | feature_request | wtp | churn_reason | jobs_to_be_done | workaround | competitor_mention | unmet_need | timing_signal | regulatory_pressure | distribution_channel
+    raw_quote: string                  # MANDATORY — verbatim, original language preserved
+    raw_quote_language: string         # "en" | "ru" | "es" — for non-English quotes
+    paraphrase_or_summary: string      # 1-2 lines, in English, for skim-readers
+
+  opportunity_classification:           # v4.1 taxonomy
+    type: enum                         # CONTRARIAN | TIMING_PLAY | SAFE_BET | NOT_OPPORTUNITY
+    rationale: string                  # WHY this classification — be specific
+
+  signal_strength:
+    novelty: enum                      # never_seen_before | first_time_quantified | confirms_known | repeats_existing
+    distinctness: enum                 # unique_to_this_segment | crosses_segments | universal
+    actionability: enum                # immediate | requires_validation | strategic_horizon
+
+  evidence_grade:
+    grade: enum                        # HIGH | MODERATE | LOW | VERY_LOW
+    grade_rationale: string            # sample size, recency, source bias, etc.
+
+optional:
+  counter_evidence: list_of_strings    # contradicting signals from other cards
+  timing_signal: string                # why_now or why_not_yet
+  competitor_response: string          # how incumbents have addressed (or failed to)
+  tam_implication: string               # rough sizing if SCOUT confident
+  willingness_to_pay_signal: string    # specific price mentions, abandoned price points
+  reviewer_notes: string                # filled by MARKET_REVIEWER
+
+rules_for_scout:
+  - "RAW QUOTES MUST BE VERBATIM. No paraphrase substituted. Preserve original language."
+  - "Sample size ≥1 always explicit. 'Multiple users said' = REJECT — give n and the quotes."
+  - "Customer segment must be SPECIFIC. 'businesses' = REJECT. 'B2B SaaS PMs at <$10M ARR' = OK."
+  - "Produce ≥10 cards per stream — favor cards with raw quotes over cards summarizing aggregate data."
+  - "Filings / earnings calls / regulatory: card the specific page+section, with verbatim language."
+  - "opportunity_classification forces the SCOUT to commit. NOT_OPPORTUNITY is a valid answer."
+  - "Reddit/Telegram/Twitter cards: link to the original post even if archived."

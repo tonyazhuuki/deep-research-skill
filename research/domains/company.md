@@ -25,10 +25,23 @@ Domain: COMPANY / NICHE (specific companies, competitive landscapes, business op
 
 Your role: evaluate the QUALITY and RELIABILITY of sources and claims about companies and markets.
 
-Read ALL Cycle 1 stream files:
-[ORCHESTRATOR: list paths to all stream_*.md]
+## Inputs (v4.3 — read in this order)
 
-Create file: _methods_review.md
+1. **PRIMARY:** All `stream_*_study_cards.md` files — structured per `templates/study_card_company.yaml`.
+   These cards contain: source_type, customer_segment, raw_quote (verbatim), opportunity_classification, evidence_grade.
+   Use cards as the canonical signal record.
+2. **SECONDARY:** All `stream_*.md` narratives.
+   [ORCHESTRATOR: list paths to all stream_*.md and stream_*_study_cards.md]
+
+## Outputs
+
+1. `_methods_review.md` — your main deliverable
+2. **Fill `reviewer_notes` in each card** — write back to `stream_*_study_cards.md`:
+   - Flag cards where raw_quote was substituted by paraphrase (REJECT)
+   - Flag cards with vague customer_segment ("businesses", "users")
+   - Flag opportunity_classification mismatches (CONTRARIAN claim without evidence of incumbent blindspot)
+   - Flag sample_size_of_one cards treated as trend signal
+3. Cards-to-trust / cards-to-discount lists in `_methods_review.md`
 
 ## 1. Source Reliability Hierarchy
 

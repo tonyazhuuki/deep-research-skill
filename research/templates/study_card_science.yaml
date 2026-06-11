@@ -1,0 +1,73 @@
+# Study Card Schema — Science Domain (basic research, ML, theoretical, computational)
+# Loaded when domain = science
+# Used by: SCOUT (produces), METHODOLOGY_REVIEWER (reads), DD (reads), SYNTHESIZER (cites card_ids)
+#
+# Emphasizes: reproducibility, peer-review status, replication, code+data availability.
+
+version: 1.0
+domain: science
+
+# Card ID format: card_<stream>_<n>   e.g., card_a_04
+
+required:
+  meta:
+    doi_or_arxiv: string               # DOI for published; arxiv:NNNN.NNNNN for preprint
+    title: string
+    year: int
+    venue: string                      # "Nature" | "NeurIPS 2024" | "arXiv preprint" | "OpenReview"
+    peer_reviewed: bool
+
+  authors_and_affiliation:
+    first_author: string
+    senior_author: string
+    primary_institution: string
+    industry_affiliation: bool          # is this an industry lab paper?
+    coi_disclosed: bool
+
+  reproducibility:
+    code_available: bool
+    code_link: string_or_null
+    data_available: bool
+    data_link: string_or_null
+    preregistered: bool
+    independent_replications_count: int  # how many independent groups have reproduced
+    replication_status: enum            # replicated | partially_replicated | contested | failed_replication | single | unknown
+
+  methodology:
+    design: enum                        # experimental | computational | theoretical | observational_data | review | meta_analysis | benchmark
+    sample_size_or_n: string            # "n=1024 samples" | "10 simulations × 100 seeds" | "10K-token eval set"
+    statistical_methods: list_of_strings
+    multiple_comparisons_correction: bool_or_na
+    power_analysis_reported: bool
+
+  result:
+    primary_finding: string             # 1-2 sentences
+    effect_size_or_metric: string       # specific number with units
+    confidence_or_ci: string            # CI or σ or other uncertainty quantification
+    sota_position: string_or_null       # ML papers: "SOTA on GLUE +2.1%" | null if not benchmark
+
+  evidence_grade:
+    grade: enum                         # HIGH | MODERATE | LOW | VERY_LOW
+    grade_rationale: string             # sample size, reproducibility, peer review, replications
+
+optional:
+  notable_critiques:                     # known peer critiques
+    - source: string
+      summary: string
+
+  reviewer_concerns: string              # if peer-reviewed, surface key reviewer concerns (e.g., OpenReview)
+  citations_count: int_or_null
+  citations_recency: string              # "fast accumulating (>100 in 1yr)" | "slow"
+  benchmark_position: string             # ML papers — what SOTA, by what margin, vs what baseline
+  retraction_status: enum                # not_retracted | expression_of_concern | retracted | n/a
+  reviewer_notes: string                  # filled by METHODOLOGY_REVIEWER
+
+rules_for_scout:
+  - "Produce ≥10 cards per stream."
+  - "Preprints ALLOWED but peer_reviewed: false MUST be set. Don't conflate."
+  - "reproducibility section is load-bearing — if code/data unavailable, that's evidence in itself."
+  - "independent_replications_count = 0 for novel findings — DO NOT inflate."
+  - "ML papers without code release → grade ceiling MODERATE regardless of result claims."
+  - "Theoretical papers: methodology.design = theoretical, sample_size_or_n = 'n/a — proof', reproducibility focus on proof verification."
+  - "Industry lab papers: industry_affiliation: true forces explicit COI consideration."
+  - "Benchmarks without held-out test sets: grade ceiling LOW."
