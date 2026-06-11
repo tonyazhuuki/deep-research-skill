@@ -88,6 +88,53 @@ When re-researching a topic that already has a consensus reference, the pipeline
 - `--fresh` — force FRESH mode (ignore previous consensus)
 - No flag — auto-detect and ask user
 
+## v4.3 Features
+
+> All additive. Pipeline behaves identically to v4.2 if these features don't trigger.
+
+### Domain-Specific Study Cards
+Every SCOUT now produces a third mandatory artifact: `stream_X_study_cards.md` — structured cards (≥10 per stream for health/company/science, ≥8 for macro/creative) per a domain-specific schema in `templates/study_card_<domain>.yaml`.
+
+- **METHODOLOGIST** reads cards as primary input (not narratives) and writes `methodologist_notes` back into each card's YAML block
+- **SYNTHESIZER** cites `[card_X_NN]` for every numerical claim — audit trail for every conclusion
+- **Per-domain schema** captures what matters for that domain: health has GRADE+ROB+COI; macro has forecaster_track_record+baseline_assumptions+regime_dependency; company has raw_quote (verbatim) + opportunity_classification; science has reproducibility (code+data+replications); creative has primary_source_check+distinguishing_feature
+
+### Database Lookup (SCOUT-D variant — health domain)
+For health topics involving variants/drugs/conditions, one SCOUT becomes SCOUT-D (Database). It queries structured biomedical databases via `tools/research_adapters/db_lookup.py`:
+
+- **No-auth (works without keys):** ClinVar (variant pathogenicity), SNPedia (wellness layer), ClinPGx (drug × variant — formerly PharmGKB), ClinicalTrials.gov v2 (active trials), Reactome (pathways), OpenFDA FAERS (adverse events)
+- **Optional keys (higher rate limits):** NCBI API key, OpenFDA key
+- **Output:** `stream_d_db_calls.json` machine-readable record of every API call — METHODOLOGIST treats this as 1st-tier evidence
+
+Activation: SCOUT-D fires when topic mentions a specific gene/variant, drug × gene interaction, condition with trials, or drug AE profile. Otherwise standard SCOUT rotation.
+
+### Genome Adapter (Pre-Research Data Ingestion)
+New Step 0c before Cycle 1: if topic + user context trigger genome adapter, it runs `tools/research_adapters/genome_to_context.py` to produce `_patient_data_context.md` — topic-filtered structured table of user's variants with ClinVar/SNPedia enrichment.
+
+- **Input formats:** Markdown reports (interpreted genetics), VCF/VCF.gz (raw WGS — Dante Labs, Nebula, custom), 23andMe/AncestryDNA TSV
+- **Topic filtering:** Built-in map (neuroprotection, omega3/lipids, vitamin_d, folate, cardio, iron, PGx) — gene/rsID set restricts what gets surfaced
+- **Honest limitations:** Variants not in source files explicitly flagged as `not_in_source` — never inferred. LIMITATIONS section enumerated for SCOUTs to surface
+- **DB enrichment:** Best-effort ClinVar + SNPedia lookup per variant — works without keys
+- **Auto-detect:** Topic keywords (MTHFR, APOE, FADS1, GSK3B, BDNF, cognitive, neuroprotection, lipid, vitamin D, folate, methylation, iron/ferritin) + `context.md` patient_data block
+
+### Security Hardening
+- `.gitignore` patterns block `.research_db_keys.json`, `*api*key*.json`, `*secret*.json`, `*credentials*.json`, `*.token`, `.env*`
+- `db_lookup.load_keys()` warns on loose file permissions (expects 600)
+- `tools/sync_research_skill.sh` has a **secret-scan gate** that scans for API key patterns / Bearer tokens / sk- prefixes before any public push, **aborts** if found
+- Global API key registry in `.claude/rules/tools_registry.md` documents location of every key
+
+### CLI flags (v4.3 additions)
+- `--with-data <path>` — explicit genome source override (.md / .vcf / .vcf.gz / .tsv)
+- `--with-imaging <path>` — placeholder for v4.4 (DICOM, not yet active)
+
+### Backwards compatibility
+- **Pre-v4.3 research folders** still work — no migration required
+- **Without API keys** — pipeline degrades gracefully (4 endpoints fully functional, 2 with lower rate limits, 1 disabled)
+- **Without genetics data** — genome adapter step skipped silently if no patient_data configured
+- **SCOUT-D** falls back to standard SCOUT-E if no DB triggers detected in topic
+
+See `INSTALL.md` for setup (no setup needed for v4.2-compatible behavior).
+
 ## Quick Start
 
 1. **Copy the template:**
