@@ -1,0 +1,48 @@
+# Example output from a "full" mode health research (16 agents, ~3-4 hours)
+# Topic: Sleep Optimization (consensus + interactions + personalized)
+
+2026_02_sleep_consensus/
+├── _PROGRESS_LOG.md                    # 3 cycles + 2 reflections + hypotheses
+├── _critic_review.md                   # Cross-stream contradictions, bias audit
+├── _methods_review.md                  # GRADE assessment, ROB scores, studies to TRUST vs DISCOUNT
+├── _medical_review.md                  # Clinical safety: safe / caution / physician-required
+├── _fact_check.md                      # Top-15 claims verified (reliability: 0.82)
+├── _citation_audit.md                  # Top-20 citations checked against PubMed/Semantic Scholar
+├── _action_map.md                      # What changed: TODOs added to 5 protocol files
+│
+├── consensus_reference.md              # Level 1: "what does science say" (by outcomes)
+├── consensus_reference_ru.md           # Russian translation
+├── interaction_map.md                  # Level 2: "when does this change" (pairwise interactions)
+├── synthesis.md                        # Level 3: "what should YOU do" (10 sections, EN)
+├── synthesis_ru.md                     # Level 3: Russian translation (## 1. TL;DR for notifications)
+├── unknowns_and_next.md                # Known unknowns + 5 proposed experiments
+│
+├── stream_a_sleep_architecture.md      # SCOUT A: Analytical style
+├── stream_b_sleep_interventions.md     # SCOUT B: Contrarian style
+├── stream_c_exercise_sleep.md          # SCOUT C: Mechanistic style
+├── stream_d_nutrition_sleep.md         # SCOUT D: Systems-thinking style
+├── stream_e_circadian_chronotype.md    # SCOUT E: Pragmatic style
+│
+├── deep_dive_a_iron_sleep_pathway.md   # Tests H1: iron repletion → sleep quality
+├── deep_dive_b_dose_response.md        # Tests H2: training load sweet spot
+├── deep_dive_c_constraint_protocol.md  # Tests H3: constraint-adapted protocol
+│
+├── data/
+│   ├── sleep_interventions_data.csv    # 45 rows, snake_case columns
+│   ├── circadian_evidence.csv
+│   ├── iron_sleep_studies.csv
+│   ├── training_sleep_dose.csv
+│   └── supplement_sleep_data.csv
+│
+├── figures/
+│   ├── sleep_intervention_forest.png   # Forest plot of interventions
+│   ├── dose_response_curve.png         # Training × sleep dose-response
+│   ├── iron_sleep_projection.png       # Personalized ferritin → PSQI model
+│   ├── circadian_protocol.png          # 4-day-type visual schedule
+│   ├── interaction_heatmap.png         # Nutrient × sleep interaction matrix
+│   └── convergence_map.png             # Which findings confirmed across 3+ sources
+│
+└── scripts/
+    ├── sleep_analysis.py               # Main analysis + visualizations
+    ├── dose_response_model.py          # Training × sleep modeling
+    └── .venv/                          # Python virtual environment

@@ -1,0 +1,90 @@
+# Study Card Schema — Marketing / Growth / Distribution Domain
+# Loaded when domain = marketing
+# Used by: SCOUT + SCOUT-B (produce), METHODOLOGIST (reads PRIMARY + write-backs),
+#          DD (reads), CMO_REVIEWER (reads), SYNTHESIZER (cites card_ids)
+#
+# Critical: marketing "truth" decays. Every card is DATED and LAYERED.
+# Inherits company.md's verbatim-quote discipline — raw quotes are mandatory for audience-language cards.
+#
+# v1 calibration (2026-07-18): enum values + grade ladder are first-pass — revisit after first real run.
+
+version: 1.0
+domain: marketing
+
+# Card ID format: card_<stream>_<n>   e.g., card_b_07   (SCOUT-B uses stream letter b)
+
+required:
+  meta:
+    source_type: enum                  # ab_test | holdout_or_geo_lift | mmm | platform_benchmark |
+                                       # first_party_case | practitioner_report | vendor_case_study |
+                                       # academic_study | ad_library_observation | buzz_signal |
+                                       # teardown_observation
+    source_url_or_handle: string
+    date_observed: string              # MANDATORY YYYY-MM — when the RESULT was measured, not published.
+                                       # Undated tactic claim => METHODOLOGIST REJECT.
+    geography_and_market: string       # "US" | "EU" | "Cyprus" | "global" | "RU-speaking" | "MENA"
+
+  claim:
+    claim_layer: enum                  # principle | channel_econ | tactic | arbitrage   (see marketing.md "Truth Model")
+    segment: enum                      # b2b | b2c | both        (NEW v1.1 — required)
+                                       #   'both' allowed ONLY with cross-segment evidence; lazy 'both' = REJECT.
+                                       #   prosumer/creator audiences => tag b2c + note in icp_context.
+    marketing_mode: enum               # strategy | performance  (NEW v1.1 — required)
+                                       #   segment × marketing_mode = quadrant (SxB / SxC / PxB / PxC)
+    resource_model: enum               # bootstrap | paid | hybrid   (NEW v1.2 — OPTIONAL)
+                                       #   the marketing "religion" this evidence comes from — a DISTINCT axis
+                                       #   from marketing_mode. 'paid'=media-buying/CAC-LTV school;
+                                       #   'bootstrap'=organic/audience-first/build-in-public/low-budget.
+                                       #   NOT the same as the Performance quadrant (see marketing.md collision warning).
+                                       #   Tag it so a paid-media playbook card is NOT recommended to a bootstrap brand.
+    channel: string                    # instagram | telegram | linkedin | seo | paid_meta | email | tiktok | ...
+    funnel_stage: enum                 # awareness | capture | nurture | conversion | retention | referral
+    tactic_statement: string           # ONE falsifiable sentence
+    icp_context: string                # SPECIFIC audience — "B2B SaaS PMs at <$10M ARR", not "businesses".
+                                       # Missing icp_context on a performance claim => METHODOLOGIST flag.
+    raw_quote: string                  # verbatim audience/practitioner language, original language preserved
+    raw_quote_language: string         # "en" | "ru" | "es" — for non-English quotes
+
+  measurement:
+    design: enum                       # randomized | holdout | before_after | benchmark_aggregate |
+                                       # testimony | observation_only
+    metric: string                     # the ACTUAL metric moved (CVR, CAC, reply_rate, retention, LTV...)
+    effect: string                     # with denominator + baseline + duration
+                                       # e.g. "CVR 2.1%->3.4% over 6wk, n=14k sessions"
+    engagement_only: bool              # true if only likes/views/comments => auto-cap grade E
+    spend_or_scale_level: string       # CAC/CVR claims meaningless without it — "$1k/mo" vs "$100k/mo".
+                                       # Missing on a CAC claim => METHODOLOGIST flag (ungradeable).
+
+  bias_audit:
+    coi: enum                          # platform_self | tool_vendor | agency_selling_service |
+                                       # independent_operator | academic | unknown
+                                       #   platform_self/tool_vendor about OWN effectiveness => cap D
+    survivorship_risk: enum            # published_winner | includes_failures | population_data
+    attribution_method: string         # last_click | platform_reported | incrementality | mmm | none
+
+  evidence_grade:
+    grade: enum                        # A | B+ | B | C+ | C | D | E   (see marketing.md evidence ladder)
+    freshness_adjusted: bool           # true if the §Truth-Model freshness downgrade fired on this card
+    grade_rationale: string            # measurement design, date/recency, COI, spend level, etc.
+
+optional:
+  counter_evidence: list_of_strings    # contradicting signals from other cards
+  transfer_conditions: string          # WHY it works => for whom / which quadrant it will (not) transfer
+  saturation_signal: string            # how widely is this tactic already copied?
+  platform_change_note: string         # any known algorithm/policy change affecting this claim's validity
+  competitor_response: string          # how incumbents addressed (or failed to) — for teardowns
+  willingness_to_pay_signal: string    # price mentions, abandoned price points, offer reactions
+  methodologist_notes: string          # filled by METHODOLOGIST (grade adjustments, freshness, guards)
+  reviewer_notes: string               # filled by CMO_REVIEWER
+
+rules_for_scout:
+  - "date_observed is MANDATORY. An undated tactic claim is unusable — do not produce the card without it."
+  - "RAW QUOTES MUST BE VERBATIM. No paraphrase substitution. Preserve original language."
+  - "segment + marketing_mode are REQUIRED — they define the quadrant. 'both' needs cross-segment evidence."
+  - "icp_context must be SPECIFIC. 'businesses' / 'marketers' = REJECT. 'B2B SaaS founders <$5M ARR' = OK."
+  - "CAC/CVR/economics claims MUST carry spend_or_scale_level — otherwise the number is ungradeable."
+  - "engagement_only=true => this card CANNOT exceed grade E. Attention is not an outcome."
+  - "Vendor/platform claims about their OWN product effectiveness => grade cap D (set coi accordingly)."
+  - "Produce >=8 cards per stream (marketing tier). Favor measured-lift + dated cards over aggregate summaries."
+  - "SCOUT-B (buzz) cards: source_type=buzz_signal, grade <=C (E if engagement_only), tag the quadrant, link the original post."
+  - "Leave methodologist_notes / reviewer_notes EMPTY — those agents own them."

@@ -1,0 +1,54 @@
+# Study Card Schema — Creative / Generative Art Domain
+# Loaded when domain = creative
+# Used by: SCOUT (produces), DOMAIN_REVIEWER/creative (reads), SYNTHESIZER (cites card_ids)
+#
+# Different from other domains: this is about REFERENCES (artifacts, techniques, lineages)
+# not "studies." Forces SCOUT to ground in primary-source observation, not secondhand.
+
+version: 1.0
+domain: creative
+
+# Card ID format: card_<stream>_<n>   e.g., card_c_12
+
+required:
+  meta:
+    artifact_title_or_id: string        # specific work — "Rothko No. 14, 1960" | "p5.js sketch by Dan Shiffman 2021-05" | "Brian Eno — Ambient 1"
+    creator_or_attribution: string
+    year_or_era: string                 # "1960" | "early 90s" | "Tang dynasty" | "ongoing 2020-present"
+    medium: enum                        # painting | sculpture | film | video | code | music | text | installation | photography | digital_image | nft | other
+    source_url: string                  # where the SCOUT can see/hear it — museum, archive, github, soundcloud
+
+  reference_value:
+    technique: string                   # WHAT is technically distinctive — be specific
+    movement_or_lineage: string         # tradition/movement/school it belongs to
+    distinguishing_feature: string      # the ONE thing that makes it NOT generic — the reason to cite it
+    why_relevant_to_query: string       # SCOUT explains why this specific artifact is a reference for the query
+
+  primary_source_check:
+    direct_observation: bool            # did SCOUT actually view/hear/read it, or work from descriptions?
+    transcript_or_image_quoted: string  # specific quote, frame description, code snippet, lyric — concrete grounding
+    secondhand_source: string_or_null   # if direct_observation: false, cite the writer/critic who described it
+
+  influence_and_reception:
+    influence_reach: enum               # canonical | well_known | niche | obscure
+    notable_followers: list_of_strings  # 1-3 artists who explicitly cite/extend this
+    contemporary_relevance: string      # is this still cited in current work? where?
+
+  evidence_grade:
+    grade: enum                         # HIGH | MODERATE | LOW | VERY_LOW
+    grade_rationale: string
+
+optional:
+  copyright_status: string               # public domain | active copyright | unclear | creative_commons:variant
+  reproduction_difficulty: enum         # easy | moderate | hard | impossible_outside_original
+  personal_taste_match: string           # in personalized mode — does this match user's stated aesthetic?
+  related_artifacts: list_of_strings    # 1-3 other card_ids that pair with this
+  reviewer_notes: string
+
+rules_for_scout:
+  - "Produce ≥8 cards per stream — depth over breadth in creative domain."
+  - "direct_observation: false is OK but FORCES secondhand_source to be cited."
+  - "distinguishing_feature MUST be specific. 'beautiful' | 'innovative' = REJECT. 'cobalt blue ground with single horizontal cadmium red field, no brushwork visible' = OK."
+  - "AI-generated reference points allowed but must specify model+prompt+seed if possible."
+  - "Pure 'famous for being famous' references — REJECT unless primary_source_check shows the actual technique."
+  - "If SCOUT cannot find a working source_url, mark and reduce grade — orphan references degrade output."

@@ -1,0 +1,67 @@
+# Study Card Schema — Macro Domain (markets, economics, geopolitics)
+# Loaded when domain = macro
+# Used by: SCOUT (produces), METHODOLOGIST/macro (reads), DD (reads), SYNTHESIZER (cites card_ids)
+
+version: 1.0
+domain: macro
+
+# Card ID format: card_<stream>_<n>   e.g., card_a_05
+
+required:
+  meta:
+    source_url: string                 # canonical URL
+    source_type: enum                  # central_bank_report | investment_bank_research | academic_paper | think_tank | gov_data | filing | earnings_call | speech | model_output | aggregator
+    author_or_institution: string
+    year: int
+    month: int_or_null
+
+  forecaster_track_record:
+    institution_type: enum             # central_bank | investment_bank | academic | think_tank | independent | aggregator
+    historical_accuracy_known: bool
+    known_calibration_notes: string    # e.g., "Fed dot plot 2022 missed inflation by 200 bps" — surface BEFORE forecast
+    notes: string
+
+  forecast:
+    target_variable: string             # CPI YoY | US GDP growth | Brent | EUR/USD | etc.
+    horizon: enum                       # spot | 1M | 3M | 6M | 1Y | 2Y | 3Y | 5Y+
+    point_estimate: number_or_string
+    range_low: number_or_null
+    range_high: number_or_null
+    confidence_interval_pct: number_or_null
+    methodology: enum                   # DSGE | VAR | factor_model | expert_judgment | consensus_survey | scenario_analysis | other
+
+  baseline_assumptions:                 # ≥2 explicit assumptions — load-bearing
+    - assumption: string
+      falsification_trigger: string     # what observable would falsify this assumption?
+
+  regime_dependency:
+    current_regime: string              # e.g., "post-ZIRP tightening cycle" | "deglobalization Phase 2"
+    regime_stability_assessment: enum   # stable | transitioning | inflection_risk
+    regime_break_scenarios: list_of_strings
+
+  evidence_quality:
+    data_source: string                 # primary data behind claim
+    data_recency: string                # publication date of underlying data
+    grade: enum                         # HIGH | MODERATE | LOW | VERY_LOW
+    grade_rationale: string
+
+optional:
+  prior_revisions:                       # has this forecast been revised? track drift
+    - date: string
+      from_value: string
+      to_value: string
+      reason: string
+
+  consensus_position: enum               # consensus | contrarian_bearish | contrarian_bullish | tail_call
+  peer_critiques: list_of_strings        # 1-2 known critiques of methodology
+  confounding_factors: list_of_strings
+  reflexivity_risk: string               # if forecast is widely held, does it self-fulfill or self-defeat?
+  methodologist_notes: string            # filled by METHODOLOGIST/macro
+
+rules_for_scout:
+  - "Produce ≥8 cards per stream — the load-bearing forecasts/data points behind your narrative."
+  - "forecaster_track_record is MANDATORY for any predictive claim — surface calibration history first."
+  - "If forecaster has known poor calibration on this asset class, FLAG in grade_rationale."
+  - "baseline_assumptions ≥2 — every macro call hides assumptions, surface them."
+  - "regime_dependency forces explicit thought about when consensus breaks."
+  - "Do NOT card opinion pieces / pundit takes — only data-backed or model-backed claims."

@@ -1,0 +1,25 @@
+# Personal research context — your private data stays local.
+# INSTALL.md and the context_template.md header promise this file is gitignored;
+# this makes that promise real. Copy context_template.md -> context.md and fill
+# it with YOUR biomarkers/genetics/paths — it will never be committed.
+context.md
+
+# Secrets, keys, tokens — never commit
+.env
+.env.*
+*.token
+*api*key*.json
+*secret*.json
+.research_db_keys.json
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+*.egg-info/
+
+# OS / editor
+.DS_Store
+.idea/
+.vscode/
