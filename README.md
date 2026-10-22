@@ -1,6 +1,8 @@
-# Deep Research Skill for Claude Code
+# Deep Research Skill for Claude Code and Codex
 
-A drop-in [Claude Code](https://docs.anthropic.com/en/docs/claude-code) skill that turns Claude into a 10-18 agent research team. Three cycles, hypothesis-driven, adversarial review, domain-specific quality gates — all automated.
+A research harness with a full Claude Code workflow and a standalone Codex core. Three cycles, hypothesis-driven search, adversarial review, domain-specific quality gates, and explicit validation.
+
+The Claude package contains the mature role/prompt catalog. The Codex package is a lean first adaptation of the same method: it preserves the research contract and quality gates without depending on `.claude/**` or a particular personal vault. It does not yet claim prompt-for-prompt or benchmark parity with the Claude package.
 
 One command. ~$3-15 per session. 300-800 line synthesis with evidence grades.
 
@@ -115,6 +117,24 @@ Domain is auto-detected from topic keywords, or can be specified explicitly.
 
 ## Installation
 
+### Codex
+
+```bash
+# From the cloned repository
+mkdir -p ~/.codex/skills/deep-research
+cp -R codex/deep-research/. ~/.codex/skills/deep-research/
+
+# Validate the installed package
+python3 ~/.codex/skills/deep-research/scripts/validate_skill.py
+
+# Maintainers: validate the entire public tree for private-vault fingerprints
+python3 tools/validate_public_release.py
+```
+
+Invoke it as `$deep-research`. The Codex package is self-contained; project-specific personal-data access must be supplied through an explicit private adapter.
+
+### Claude Code
+
 ```bash
 # Clone this repo
 git clone https://github.com/tonyazhuuki/deep-research-skill.git
@@ -204,7 +224,8 @@ YYYY_MM_topic_name/
 ## Dependencies
 
 **Required:**
-- Claude Code CLI (`claude`)
+- Claude Code CLI (`claude`) for the Claude package, or Codex for the Codex package
+- Python 3.9+ for validators and research adapters
 
 **Optional (for Cycle 3 scripts):**
 - Python 3.10+ with `matplotlib`, `pandas`, `numpy`

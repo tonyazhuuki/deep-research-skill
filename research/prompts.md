@@ -723,6 +723,8 @@ IMPORTANT:
 
 If the user's `preferred_language` in context.md is not English, also produce `synthesis_[lang].md` — a full translation of the synthesis into the user's preferred language (not a summary, a complete translation preserving all data, tables, and references).
 
+For **business decision-research (company / marketing / macro)** write this full translation to `synthesis_[lang]_full.md` instead — the orchestrator later wraps it into the «вывод первым» reader's document (`templates/synthesis_business.md`). Health: unchanged.
+
 ### So What Test (MANDATORY section at the end of synthesis_[lang].md)
 
 Summarize the ENTIRE research for a smart non-expert who has never read any of it.

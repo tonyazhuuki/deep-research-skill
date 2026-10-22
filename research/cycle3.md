@@ -23,6 +23,8 @@ It reads ALL md files and creates:
 
 **⚠️ Narrative longread rule (added 2026-07-18, generalized 2026-07-19):** the trigger is **request type, not domain**. «Понять поле / карта темы / изучить X» → user-facing `synthesis_[lang].md` follows `templates/synthesis_longread.md` in ANY domain (company, science, macro, creative, marketing, mixed): narrative, stories-first, NO invented terminology, personal transfer only if explicitly requested, written by the ORCHESTRATOR in one pass — not assembled from subagent chunks. Decision-research («принимать ли X», go/no-go) in any domain + ALL health research keep the 12-section v3.10 layout. Origin: 2026_07_emergence_design user feedback («сухо, непонятно, выдуманная терминология»).
 
+**⚠️ Business «вывод первым» rule (added 2026-10-22):** decision-research in **company / marketing / macro** (finance, partners, deals, pricing) keeps the 12-section v3.10 in `synthesis.md`, but the **user-facing `synthesis_[lang].md` is a Minto pyramid** per `templates/synthesis_business.md`: answer + three reasons + steps on the first screen, 3–7 sections named as the reader's questions, the full v3.10 text inside collapsed «Подробнее» blocks. Assembled by `tools/research_pyramid_build.py` (see 4f). Health — unchanged. Origin: 2026_10_mosta_partner_programs feedback («пока дочитаешь до важного — умрёшь»).
+
 ## 4b-bis. TEMPORAL DIFF (UPDATE mode only)
 
 **Skip this section entirely if UPDATE_MODE is not set in _PROGRESS_LOG.md.**
@@ -210,6 +212,7 @@ diff /tmp/_all_urls.txt /tmp/_sources_urls.txt  # should be empty if extraction 
 
 Check `context.md` for `preferred_language`. If set (e.g., `ru`):
 - **personalized/full:** Create `synthesis_ru.md` — full translation (YAML: `language: ru`). Section `## 1. TL;DR` is MANDATORY — written in human-readable language, used for Telegram notifications.
+  - **Business decision-research (domain company / marketing / macro — includes finance):** the full translation is saved as `synthesis_ru_full.md` instead; after HUMANIZER, Frontier Radar, So What and Read-back are in it, the ORCHESTRATOR writes `_synthesis_ru_top.md` and assembles `synthesis_ru.md` with `python3 tools/research_pyramid_build.py <research_dir>` per `templates/synthesis_business.md` («вывод первым»: answer → reasons → steps, details collapsed below). The tool refuses to write if any line of the full text is lost — fix the top layer, never trim the text. **Health is never assembled this way.**
 - **consensus/consensus+interactions/full:** Create `consensus_reference_ru.md` — MANDATORY full translation of consensus_reference.md. MUST include `## 1. TL;DR` section at the top (after YAML) with 6-8 population-level bullet points in Russian. This is a universal document — NO personalization. The TL;DR is used by `notify_research.py` for Telegram notifications.
 
 **NOTE:** `consensus_reference_ru.md` is NOT optional. Every consensus research MUST produce both EN and RU versions. The RU version is the primary notification target.

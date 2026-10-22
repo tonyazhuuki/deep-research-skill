@@ -9,6 +9,7 @@
 - [ ] ≥3 CSV, ≥3 visualizations, ≥2 Python scripts
 - [ ] `synthesis.md` (10 sections) + `unknowns_and_next.md`
 - [ ] `synthesis_[lang].md` if preferred_language set in context.md
+- [ ] **Business decision-research (company/marketing/macro):** `synthesis_[lang].md` assembled by `tools/research_pyramid_build.py` from `synthesis_[lang]_full.md` + `_synthesis_[lang]_top.md` (exit 0 = nothing lost), per `templates/synthesis_business.md`. Not for health.
 - [ ] `consensus_reference.md` (if consensus/full mode)
 - [ ] `consensus_reference_ru.md` with `## 1. TL;DR` (**MANDATORY** if consensus/full + preferred_language set)
 - [ ] `interaction_map.md` (if consensus+interactions/full mode)
